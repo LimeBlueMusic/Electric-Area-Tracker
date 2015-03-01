@@ -1,0 +1,30 @@
+{
+  "name": "bpm_tracker",
+  "version": "1.0.0",
+  "description": "bpm playlist tracking",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "bpm",
+    "bpm",
+    "playlist"
+  ],
+  "author": "scttcper",
+  "license": "MIT",
+  "dependencies": {
+    "bson": "^0.2.19",
+    "concat-stream": "^1.4.7",
+    "koa-cors": "0.0.14",
+    "koa.io": "0.0.3",
+    "lodash": "^3.3.1",
+    "moment": "^2.9.0",
+    "monk": "^0.9.1",
+    "request": "^2.53.0",
+    "request-promise": "^0.4.0",
+    "sleep": "^2.0.0",
+    "twitter": "^1.2.1"
+  }
+}

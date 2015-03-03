@@ -7,25 +7,49 @@ var app = require('koa.io')(),
     http = require('http');
 
 var history = [],
+    today = [],
     url = 'https://api.spotify.com/v1/search?query=',
     currentevent,
     tracks = db.get('tracks'),
-    badIds = ['^I', ''];
+    stream = db.get('stream');
 
 // http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
-var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/';
+var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
+    badIds = ['^I', ''];
 
 app.use(require('koa-cors')());
 
-tracks.find({}, {'sort': [['$natural', -1]], 'limit': 5}, function(err, res){
+
+tracks.ensureIndex('xmSongID', {
+    unique: true
+});
+
+stream.find({}, {
+    'sort': [
+        ['$natural', -1]
+    ],
+    'limit': 100
+}, function(err, res) {
     history = res;
 });
 
+tracks.find({
+    firstHeard: {
+        $gt: moment.utc().subtract(1, 'day').toISOString()
+    }
+}, {}, function(err, res) {
+    today = res;
+    console.log(res);
+});
 
-app.io.route('recentBPM', function* () {
+
+app.io.route('recentBPM', function*() {
     this.emit('recentBPM', history);
 });
 
+app.io.route('newToday', function*() {
+    this.emit('newToday', today);
+});
 
 function spotify(artists, track, info, callback) {
     var query = 'artist:' + artists + '+track:' + track + '&type=track';
@@ -55,15 +79,35 @@ function newSong(artists, track, xmInfo) {
         'spotify': {},
         'artists': artists.split('#')[0].split('/'),
         'track': track.split('#')[0],
-        'xmSongID': xmInfo.song.id
+        'xmSongID': xmInfo.song.id,
+        'heard': moment.utc().toISOString()
     };
     artists = artists.split('#')[0].replace(/[\s\/()]/g, '+');
     track = track.split('#')[0].replace(/[\s\/()]/g, '+');
     spotify(artists, track, info, function(info) {
         app.io.emit('bpm', info);
-        tracks.insert(info);
+        stream.insert(info);
+        tracks.update({
+            'xmSongID': info.xmSongID
+        }, {
+            $inc: {
+                'plays': 1
+            },
+            $currentDate: {
+                lastHeard: true
+            },
+            $setOnInsert: {
+                firstHeard: moment.utc().toISOString(),
+                artists: info.artists,
+                track: info.track,
+                xmSongID: info.xmSongID
+            }
+        }, {
+            upsert: true
+        });
+
         console.log(info);
-        history.push(info);
+        history.unshift(info);
     });
 }
 
@@ -82,7 +126,7 @@ function checkEndpoint() {
             } catch (e) {
                 console.log(e);
             }
-            if (cur && res.channelMetadataResponse.messages.code !== 305 && cur.song.id !== currentevent) {
+            if (cur && res.channelMetadataResponse.messages.code !== 305 && cur.song.id !== currentevent && history[0].xmSongID !== cur.song.id) {
                 currentevent = cur.song.id;
                 if (badIds.indexOf(cur.song.id) === -1) {
                     newSong(cur.artists.name, cur.song.name, cur);

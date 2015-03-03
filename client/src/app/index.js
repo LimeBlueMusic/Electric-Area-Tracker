@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('client', ['ngAnimate', 'ngRoute', 'mgcrea.ngStrap', 'btford.socket-io']).config(function($routeProvider) {
+angular.module('client', ['ngAnimate', 'ngRoute', 'mgcrea.ngStrap', 'btford.socket-io', 'ngEqualizer', 'picardy.fontawesome', 'angularMoment']).config(function($routeProvider) {
     $routeProvider
         .when('/', {
             templateUrl: 'app/main/main.html',
@@ -9,8 +9,8 @@ angular.module('client', ['ngAnimate', 'ngRoute', 'mgcrea.ngStrap', 'btford.sock
         .otherwise({
             redirectTo: '/'
         });
-}).factory('socket', function (socketFactory) {
-  return socketFactory({
-    ioSocket: io.connect('http://localhost:5000')
-  });
+}).factory('socket', function(socketFactory) {
+    return socketFactory({
+        ioSocket: io.connect('http://localhost:5000')
+    });
 });

@@ -23,6 +23,9 @@ app.use(require('koa-cors')());
 tracks.ensureIndex('xmSongID', {
     unique: true
 });
+stream.ensureIndex('xmSongID', {
+    unique: true
+});
 
 stream.find({}, {
     'sort': [
@@ -39,7 +42,6 @@ tracks.find({
     }
 }, {}, function(err, res) {
     today = res;
-    console.log(res);
 });
 
 
@@ -85,8 +87,12 @@ function newSong(artists, track, xmInfo) {
     artists = artists.split('#')[0].replace(/[\s\/()]/g, '+');
     track = track.split('#')[0].replace(/[\s\/()]/g, '+');
     spotify(artists, track, info, function(info) {
-        app.io.emit('bpm', info);
-        stream.insert(info);
+        stream.insert(info).success(function(doc){
+            app.io.emit('bpm', doc);
+            console.log(doc);
+            history.unshift(doc);
+        });
+        
         tracks.update({
             'xmSongID': info.xmSongID
         }, {
@@ -100,14 +106,12 @@ function newSong(artists, track, xmInfo) {
                 firstHeard: moment.utc().toISOString(),
                 artists: info.artists,
                 track: info.track,
-                xmSongID: info.xmSongID
+                xmSongID: info.xmSongID,
+                spotify: info.spotify
             }
         }, {
             upsert: true
         });
-
-        console.log(info);
-        history.unshift(info);
     });
 }
 

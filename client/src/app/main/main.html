@@ -1,3 +1,5 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
 <div class="container">
     <div class="row">
 
@@ -19,7 +21,7 @@
                             <p class="text-center">
                                 <a href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
                                     <fa name="spotify" size="1"></fa> spotify</a> 
-                                <a href="#" class="btn btn-default btn-sm" role="button"><fa name="heart" size="1"></fa> hype</a></a>
+                                <a ng-href="http://hypem.com/search/{{song.hypem}}/1/?sortby=favorite" target="_blank" class="btn btn-default btn-sm" role="button"><fa name="heart" size="1"></fa> hype</a></a>
                             </p>
                         </div>
                     </div>

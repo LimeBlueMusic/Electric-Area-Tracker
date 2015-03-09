@@ -1,5 +1,12 @@
+body {
+  padding-top: 70px;
+}
 .card .caption {
     padding: 9px;
     color: #333;
     height: 500px;
+}
+
+.huge {
+    font-size: 40px;
 }

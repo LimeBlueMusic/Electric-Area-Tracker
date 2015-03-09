@@ -1,14 +1,12 @@
 var app = require('koa.io')(),
     _ = require('lodash'),
     db = require('monk')('localhost/bpm'),
-    request = require('request'),
     moment = require('moment'),
     concat = require('concat-stream'),
-    http = require('http');
+    https = require('https');
 
 var history = [],
     today = [],
-    url = 'https://api.spotify.com/v1/search?query=',
     currentevent,
     tracks = db.get('tracks'),
     stream = db.get('stream');
@@ -19,45 +17,36 @@ var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
 
 app.use(require('koa-cors')());
 
-
+// Setup Indexes if they don't exist
 tracks.ensureIndex('xmSongID', {
     unique: true
 });
-stream.ensureIndex('xmSongID', {
-    unique: true
-});
+stream.ensureIndex('xmSongID');
+stream.ensureIndex('heard');
 
-stream.find({}, {
-    'sort': [
-        ['$natural', -1]
-    ],
-    'limit': 100
-}, function(err, res) {
+stream.find({heard: {$gt: moment().subtract(1, 'days').toISOString()}}, {
+    'sort': [['$natural', -1]]})
+.on('success', function(res) {
     history = res;
 });
 
-tracks.find({
-    firstHeard: {
-        $gt: moment.utc().subtract(1, 'day').toISOString()
-    }
-}, {}, function(err, res) {
+tracks.find({firstHeard: {$gt: moment.utc().subtract(1, 'day').toISOString()}}, {})
+.on('success', function(err, res) {
     today = res;
 });
-
 
 app.io.route('recentBPM', function*() {
     this.emit('recentBPM', history);
 });
 
-app.io.route('newToday', function*() {
-    this.emit('newToday', today);
-});
-
 function spotify(artists, track, info, callback) {
     var query = 'artist:' + artists + '+track:' + track + '&type=track';
-    console.log(url + query);
-    request(url + query, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
+    console.log('https://api.spotify.com/v1/search?query=' + query);
+    https.get({
+        host: 'api.spotify.com',
+        path: ('/v1/search?query=' + query)
+    }, function(response) {
+        response.pipe(concat(function(body) {
             var res = JSON.parse(body);
             var chosen = _.max(res.tracks.items, 'popularity');
             if (chosen !== -Infinity) {
@@ -68,9 +57,10 @@ function spotify(artists, track, info, callback) {
                 info.spotify.album = chosen.album.name;
             }
             callback(info);
-        } else {
-            callback(info);
-        }
+        }));
+    }).on('error', function(e) {
+        callback(info);
+        console.log('problem with request: ' + e.message);
     });
 }
 
@@ -84,30 +74,25 @@ function newSong(artists, track, xmInfo) {
         'xmSongID': xmInfo.song.id,
         'heard': moment.utc().toISOString()
     };
-    artists = artists.split('#')[0].replace(/[\s\/()]/g, '+');
-    track = track.split('#')[0].replace(/[\s\/()]/g, '+');
+    artists = artists.split('#')[0].replace(/[\s\/\\()]/g, '+');
+    track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
     spotify(artists, track, info, function(info) {
         stream.insert(info).success(function(doc){
             app.io.emit('bpm', doc);
             console.log(doc);
             history.unshift(doc);
         });
-        
-        tracks.update({
-            'xmSongID': info.xmSongID
-        }, {
-            $inc: {
-                'plays': 1
-            },
-            $currentDate: {
-                lastHeard: true
-            },
+
+        // move spotify to setOnInsert
+        tracks.update({'xmSongID': info.xmSongID}, {
+            $inc: {'plays': 1},
+            $set: {spotify: info.spotify},
+            $currentDate: {lastHeard: true},
             $setOnInsert: {
                 firstHeard: moment.utc().toISOString(),
                 artists: info.artists,
                 track: info.track,
                 xmSongID: info.xmSongID,
-                spotify: info.spotify
             }
         }, {
             upsert: true
@@ -118,7 +103,7 @@ function newSong(artists, track, xmInfo) {
 function checkEndpoint() {
     var datetime = moment.utc().subtract(1, 'minute').format('MM-DD-HH:mm:00');
     console.log(sirius + datetime);
-    return http.get({
+    https.get({
         host: 'www.siriusxm.com',
         path: (sirius + datetime)
     }, function(response) {

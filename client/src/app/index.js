@@ -1,6 +1,14 @@
 'use strict';
 
-angular.module('client', ['ngAnimate', 'ngRoute', 'mgcrea.ngStrap', 'btford.socket-io', 'ngEqualizer', 'picardy.fontawesome', 'angularMoment']).config(function($routeProvider) {
+angular.module('client', ['ngAnimate',
+    'ngRoute',
+    'mgcrea.ngStrap',
+    'btford.socket-io',
+    'ngEqualizer',
+    'picardy.fontawesome',
+    'angularMoment',
+    'metricsgraphics',
+]).config(function($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'app/main/main.html',
         controller: 'MainCtrl'

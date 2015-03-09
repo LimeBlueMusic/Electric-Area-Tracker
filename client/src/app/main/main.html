@@ -1,54 +1,67 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
 
 <div class="container">
-    <div class="row">
-
-
-        <div class="col-xs-12">
-            <div class="page-header"><h1>BPM Now Playing</h1></div>
+    <div class="row" style="padding-bottom:10px;">
+        <div class="col-sm-3 text-center">
+            <h4><small>Most Played Today</small></h4>
+            <h4>Redefined ft. Novaspace</h4>
+            <ul class="list-inline">
+                <li>Martin Solveig</li>
+                <li>GTA</li>
+            </ul>
+        </div>
+        <div class="col-sm-9">
             <div class="row">
-                <div class="col-sm-3" ng-repeat="song in recent track by song._id">
+                <div class="col-xs-4">
+                    <div class="text-center">
+                        <h2>13</h2>
+                        <p><small>songs in 24 hours</small></p>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    <div class="text-center">
+                        <h2>13</h2>
+                        <p><small>unique songs in 24 hours</small></p>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    <div class="text-center">
+                        <h2>13</h2>
+                        <p><small>most heard today</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-sm-3" ng-repeat="song in recent track by $index">
                     <div class="thumbnail">
                         <img ng-src="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}">
                         <div class="caption" equalizer="group">
                             <small class="text-muted" am-time-ago="song.heard"></small>
                             <h5>{{song.track}}</h5>
                             <ul class="list-inline">
-                                <li ng-repeat="artist in song.artists"><a><small>{{artist}}</small></a> </li>
+                                <li ng-repeat="artist in song.artists track by $index"><a><small>{{artist}}</small></a> </li>
                             </ul>
                         </div>
                         <div>
                             <p class="text-center">
-                                <a href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
-                                    <fa name="spotify" size="1"></fa> spotify</a> 
-                                <a ng-href="http://hypem.com/search/{{song.hypem}}/1/?sortby=favorite" target="_blank" class="btn btn-default btn-sm" role="button"><fa name="heart" size="1"></fa> hype</a></a>
+                                <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
+                                    <fa name="spotify" size="1"></fa></a>
+                                <a ng-href="http://hypem.com/search/{{song.hypem}}/1/?sortby=favorite" target="_blank" class="btn btn-default btn-sm" role="button">
+                                    <fa name="heart" size="1"></fa></a>
+                                </a>
+                                <a ng-href="" target="_blank" class="btn btn-default btn-sm btn-info" role="button">
+                                    <fa name="info-circle" size="1"></fa></a>
+                                </a>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
-<!--         <div class="col-sm-4">
-            <h4 class="text-center">New Today</h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Song</th>
-                        <th>Artists</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="song in today">
-                        <td>{{song.track}}</td>
-                        <td>{{song.artists}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            {{today}}
-        </div> -->
-
-
     </div>
 </div>

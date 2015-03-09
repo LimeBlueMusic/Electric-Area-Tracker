@@ -6,7 +6,7 @@ var app = require('koa.io')(),
     https = require('https');
 
 var history = [],
-    today = [],
+    newToday = [],
     currentevent,
     tracks = db.get('tracks'),
     stream = db.get('stream');
@@ -24,15 +24,11 @@ tracks.ensureIndex('xmSongID', {
 stream.ensureIndex('xmSongID');
 stream.ensureIndex('heard');
 
+// setup last 24 hours history
 stream.find({heard: {$gt: moment().subtract(1, 'days').toISOString()}}, {
     'sort': [['$natural', -1]]})
 .on('success', function(res) {
     history = res;
-});
-
-tracks.find({firstHeard: {$gt: moment.utc().subtract(1, 'day').toISOString()}}, {})
-.on('success', function(err, res) {
-    today = res;
 });
 
 app.io.route('recentBPM', function*() {

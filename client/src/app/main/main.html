@@ -1,33 +1,50 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
 
+
 <div class="container">
     <div class="row" style="padding-bottom:10px;">
-        <div class="col-sm-3 text-center">
-            <h4><small>Most Played Today</small></h4>
-            <h4>Redefined ft. Novaspace</h4>
-            <ul class="list-inline">
-                <li>Martin Solveig</li>
-                <li>GTA</li>
-            </ul>
+        <div class="col-sm-5">
+            <div class="row">
+                <div class="col-xs-4">
+                    <img style="max-height: 140px;" class="img-responsive" max-width="20%" ng-src="{{mostHeard.spotify.album_image || 'assets/images/album_placeholder.jpg'}}">
+                </div>
+                <div class="col-xs-8">
+                    <h4><small>Most Played Today</small></h4>
+                    <h4>{{mostHeard.track}}</h4>
+                    <ul class="list-inline">
+                        <li ng-repeat="artist in mostHeard.artists track by $index"><small>{{artist}}</small></li>
+                    </ul>
+                    <div>
+                        <a ng-show="mostHeard.spotify.album_image" href="{{mostHeard.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
+                            <fa name="spotify" size="1"></fa></a>
+                        <a ng-href="http://hypem.com/search/{{mostHeard.hypem}}/1/?sortby=favorite" target="_blank" class="btn btn-default btn-sm" role="button">
+                            <fa name="heart" size="1"></fa></a>
+                        </a>
+                        <a ng-href="" target="_blank" class="btn btn-default btn-sm btn-info" role="button">
+                            <fa name="info-circle" size="1"></fa></a>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-9">
+        <div class="col-sm-7">
             <div class="row">
                 <div class="col-xs-4">
                     <div class="text-center">
-                        <h2>13</h2>
-                        <p><small>songs in 24 hours</small></p>
+                        <h2>{{recent.length || 0}}</h2>
+                        <p><small>last 24 hours</small></p>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    <div class="text-center">
+                        <h2>{{unique24.length || 0}}</h2>
+                        <p><small>unique last 24 hours</small></p>
                     </div>
                 </div>
                 <div class="col-xs-4">
                     <div class="text-center">
                         <h2>13</h2>
-                        <p><small>unique songs in 24 hours</small></p>
-                    </div>
-                </div>
-                <div class="col-xs-4">
-                    <div class="text-center">
-                        <h2>13</h2>
-                        <p><small>most heard today</small></p>
+                        <p><small>new today</small></p>
                     </div>
                 </div>
             </div>
@@ -44,7 +61,7 @@
                             <small class="text-muted" am-time-ago="song.heard"></small>
                             <h5>{{song.track}}</h5>
                             <ul class="list-inline">
-                                <li ng-repeat="artist in song.artists track by $index"><a><small>{{artist}}</small></a> </li>
+                                <li ng-repeat="artist in song.artists track by $index"><a><small>{{artist}}</small></a></li>
                             </ul>
                         </div>
                         <div>

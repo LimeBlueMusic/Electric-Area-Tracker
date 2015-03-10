@@ -1,0 +1,13 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-6 col-xs-offset-3">
+            <div class="well well-sm">
+                {{data}}
+                {{options}}
+                <chart ng-if="data" data="data" options="options"></chart>
+            </div>
+        </div>
+    </div>
+</div>

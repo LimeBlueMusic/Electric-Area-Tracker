@@ -3,10 +3,10 @@ var app = require('koa.io')(),
     db = require('monk')('localhost/bpm'),
     moment = require('moment'),
     concat = require('concat-stream'),
+    router = require('koa-router'),
     https = require('https');
 
 var history = [],
-    newToday = [],
     currentevent,
     tracks = db.get('tracks'),
     stream = db.get('stream');
@@ -16,6 +16,7 @@ var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
     badIds = ['^I', ''];
 
 app.use(require('koa-cors')());
+app.use(router(app));
 
 // Setup Indexes if they don't exist
 tracks.ensureIndex('xmSongID', {
@@ -25,14 +26,26 @@ stream.ensureIndex('xmSongID');
 stream.ensureIndex('heard');
 
 // setup last 24 hours history
-stream.find({heard: {$gt: moment().subtract(1, 'days').toISOString()}}, {
+stream.find({heard: {$gt: moment().subtract(1, 'days').toDate()}}, {
     'sort': [['$natural', -1]]})
 .on('success', function(res) {
     history = res;
 });
 
-app.io.route('recentBPM', function*() {
-    this.emit('recentBPM', history);
+// app.io.route('recentBPM', function*() {
+//     this.emit('recentBPM', history);
+// });
+app.get('/recentBPM', function *(next) {
+    this.body = history;
+});
+app.get('/song/:song', function *(next) {
+    var that = this;
+    console.log(stream.find);
+    yield stream.aggregate({$find: {xmSongID: this.params.song}}).on('success', function(res){
+        that.body = _.map(res, function(n){
+            return {date: n.heard, value: 1};
+        });
+    });
 });
 
 function spotify(artists, track, info, callback) {
@@ -68,7 +81,7 @@ function newSong(artists, track, xmInfo) {
         'artists': artists.split('#')[0].split('/'),
         'track': track.split('#')[0],
         'xmSongID': xmInfo.song.id,
-        'heard': moment.utc().toISOString()
+        'heard': moment.utc().toDate()
     };
     artists = artists.split('#')[0].replace(/[\s\/\\()]/g, '+');
     track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
@@ -85,7 +98,7 @@ function newSong(artists, track, xmInfo) {
             $set: {spotify: info.spotify},
             $currentDate: {lastHeard: true},
             $setOnInsert: {
-                firstHeard: moment.utc().toISOString(),
+                firstHeard: moment.utc().toDate(),
                 artists: info.artists,
                 track: info.track,
                 xmSongID: info.xmSongID,

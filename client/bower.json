@@ -13,7 +13,8 @@
     "angular-moment": "~0.9.0",
     "angular-motion": "~0.3.4",
     "angular-animate": "~1.3.14",
-    "metrics-graphics": "~2.2.1"
+    "metrics-graphics": "~2.2.1",
+    "afkl-lazy-image": "~0.0.12"
   },
   "devDependencies": {
     "angular-mocks": "~1.3.4"

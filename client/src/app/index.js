@@ -1,14 +1,12 @@
 'use strict';
 
-angular.module('client', ['ngAnimate',
+angular.module('client', [
     'ngRoute',
-    'mgcrea.ngStrap',
     'btford.socket-io',
     'ngEqualizer',
     'picardy.fontawesome',
     'angularMoment',
-    'afkl.lazyImage',
-    'metricsgraphics',
+    'afkl.lazyImage'
 ]).config(function($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'app/main/main.html',

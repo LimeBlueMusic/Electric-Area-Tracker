@@ -4,11 +4,13 @@ var app = require('koa.io')(),
     concat = require('concat-stream'),
     router = require('koa-router'),
     https = require('https'),
-    mongo = require('mongodb').MongoClient;
-
+    mongo = require('mongodb').MongoClient,
+    JSONStream = require('JSONStream');
 
 mongo.connect('mongodb://localhost/bpm', function(err, db) {
-    var history = [{}],
+    var sstream = db.collection('stream');
+    var tracks = db.collection('tracks');
+    var last = {},
         currentevent;
 
     // http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
@@ -20,12 +22,18 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
 
 
     // Setup Indexes if they don't exist
-    db.collection('tracks').ensureIndex('xmSongID', {
+    tracks.ensureIndex('xmSongID', {
         unique: true
     });
-    db.collection('stream').ensureIndex('xmSongID');
-    db.collection('stream').ensureIndex('heard');
-    db.collection('stream').find({
+    sstream.ensureIndex('xmSongID');
+    sstream.ensureIndex('heard');
+    sstream.findOne({}, {'sort': [['$natural', -1]]}, function(err, doc){
+        last = doc;
+    });
+
+    app.get('/recentBPM', function*(next) {
+        this.type = 'json';
+        this.body = sstream.find({
             heard: {
                 $gt: moment().subtract(1, 'days').toDate()
             }
@@ -33,35 +41,39 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
             'sort': [
                 ['$natural', -1]
             ]
-        })
-        .toArray(function(err, docs) {
-            history = docs;
-        });
-
-
-    // setup last 24 hours history
-
-
-    // app.io.route('recentBPM', function*() {
-    //     this.emit('recentBPM', history);
-    // });
-    app.get('/recentBPM', function*(next) {
-        this.body = history;
+        }).stream().pipe(JSONStream.stringify());
     });
     app.get('/song/:song', function*(next) {
-        var that = this;
-        yield db.collection('stream').aggregate({
-            $find: {
-                xmSongID: this.params.song
+        this.type = 'json';
+        var songID = this.params.song.replace('-', '#');
+        this.body = tracks.find({xmSongID: songID}, {'limit': 1}).stream().pipe(JSONStream.stringify());
+    });
+    app.get('/songstream/:song', function*(next) {
+        this.type = 'json';
+        var songID = this.params.song.replace('-', '#');
+        this.body = db.collection('stream').aggregate([{
+            $match: {
+                xmSongID: songID
             }
-        }).on('success', function(res) {
-            that.body = _.map(res, function(n) {
-                return {
-                    date: n.heard,
-                    value: 1
-                };
-            });
-        });
+        }, {
+            $group: {
+                _id: {
+                    month: {
+                        $month: '$heard'
+                    },
+                    day: {
+                        $dayOfMonth: '$heard'
+                    },
+                    year: {
+                        $year: '$heard'
+                    }
+                },
+                count: {
+                    $sum: 1
+                }
+            }
+        }]).stream().pipe(JSONStream.stringify());
+
     });
 
     function spotify(artists, track, info, callback) {
@@ -103,11 +115,13 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
         track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
         spotify(artists, track, info, function(info) {
             app.io.emit('bpm', info);
-            history.unshift(info);
-            db.collection('stream').insertOne(info, function(err, r) {return;});
+            last = info;
+            sstream.insertOne(info, function(err, r) {
+                return;
+            });
 
             // move spotify to setOnInsert
-            db.collection('tracks').updateOne({
+            tracks.updateOne({
                 'xmSongID': info.xmSongID
             }, {
                 $inc: {
@@ -148,7 +162,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
                 } catch (e) {
                     console.log(e);
                 }
-                if (cur && res.channelMetadataResponse.messages.code !== 305 && cur.song.id !== currentevent && history[0].xmSongID !== cur.song.id) {
+                if (cur && res.channelMetadataResponse.messages.code !== 305 && cur.song.id !== currentevent && last.xmSongID !== cur.song.id) {
                     currentevent = cur.song.id;
                     if (badIds.indexOf(cur.song.id) === -1) {
                         newSong(cur.artists.name, cur.song.name, cur);

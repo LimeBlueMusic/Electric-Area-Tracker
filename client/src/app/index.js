@@ -19,15 +19,49 @@ angular.module('client', [
     });
 }).factory('socket', function(socketFactory, $location) {
     if ($location.host().split(':')[0] === 'localhost') {
-        return socketFactory({ioSocket: io.connect('//localhost:5000')});
+        return socketFactory({
+            ioSocket: io.connect('//localhost:5000')
+        });
     } else {
-        return socketFactory({ioSocket: io.connect('//localhost:5000')});
+        return socketFactory({
+            ioSocket: io.connect('//localhost:5000')
+        });
     }
-    
-}).factory('baseURL', function($location){
+
+}).factory('baseURL', function($location) {
     if ($location.host().split(':')[0] === 'localhost') {
         return '//localhost:5000';
     } else {
         return '//backend.bpm.scttcper.com';
     }
+}).factory('songstream', function(socket, baseURL, $http, $rootScope) {
+    var recent = [];
+    var isWatching = false;
+    return {
+        get: function(callback) {
+            if (recent.length !== 0) {
+                callback(recent);
+            } else {
+                $http.get(baseURL + '/recentBPM')
+                    .success(function(data) {
+                        angular.forEach(data, function(obj) {
+                            obj.xmSongID = obj.xmSongID.replace('#', '-');
+                        });
+                        recent = data;
+                        callback(recent);
+                    });
+            }
+        },
+        watch: function() {
+            isWatching = true;
+            if (!isWatching) {
+                socket.on('bpm', function(data) {
+                    data.xmSongID = data.xmSongID.replace('#', '-');
+                    recent.unshift(data);
+                    $rootScope.$broadcast('bpm', data);
+                });
+            }
+        }
+    };
+
 });

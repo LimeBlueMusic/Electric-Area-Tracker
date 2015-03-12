@@ -42,11 +42,13 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
                 ['$natural', -1]
             ]
         }).stream().pipe(JSONStream.stringify());
+        yield next;
     });
     app.get('/song/:song', function*(next) {
         this.type = 'json';
         var songID = this.params.song.replace('-', '#');
         this.body = tracks.find({xmSongID: songID}, {'limit': 1}).stream().pipe(JSONStream.stringify());
+        yield next;
     });
     app.get('/songstream/:song', function*(next) {
         this.type = 'json';
@@ -73,7 +75,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
                 }
             }
         }]).stream().pipe(JSONStream.stringify());
-
+        yield next;
     });
 
     function spotify(artists, track, info, callback) {

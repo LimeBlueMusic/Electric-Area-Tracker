@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('client').controller('MainCtrl', function($scope, $http, $window, socket, baseURL) {
+angular.module('client').controller('MainCtrl', function($scope, $http, $window, socket, songstream) {
     $scope.hypem = function(song) {
         var str = song.track.replace(/[\s\/()]/g, '+') + '+' + song.artists.join('+').replace(/[\s\/()]/g, '+');
         $window.open('http://hypem.com/search/'+str+'/1/?sortby=favorite', '_blank');
@@ -10,18 +10,17 @@ angular.module('client').controller('MainCtrl', function($scope, $http, $window,
         $scope.mostHeard = _.find(history, 'xmSongID', songid);
         $scope.unique24 = _.uniq(history, function(hist) { return hist.xmSongID; });
     };
-    socket.on('bpm', function(data) {
-        data.xmSongID = data.xmSongID.replace('#', '-');
+    
+    $scope.$on('bpm', function(event, data){
         $scope.recent.unshift(data);
         mostHeard($scope.recent);
-    });
+    });    
 
-    $http.get(baseURL + '/recentBPM')
-    .success(function(data) {
-        angular.forEach(data, function(obj){
-            obj.xmSongID = obj.xmSongID.replace('#', '-');
-        });
+    songstream.get(function(data){
         $scope.recent = data;
-        mostHeard(data);
+        mostHeard($scope.recent);
     });
+    songstream.watch();
+
+    
 });

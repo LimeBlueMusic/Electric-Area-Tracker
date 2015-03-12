@@ -10,8 +10,8 @@ angular.module('client').controller('SongCtrl', function($scope, $http, baseURL,
         MG.data_graphic({
             data: parseddata,
             target: '#plays',
-            x_accessor: "date",
-            y_accessor: "plays",
+            x_accessor: 'date',
+            y_accessor: 'plays',
             full_width: true
         });
     });

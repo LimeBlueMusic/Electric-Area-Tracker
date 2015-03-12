@@ -14,6 +14,9 @@ angular.module('client', [
     }).when('/song/:song', {
         templateUrl: 'app/song/song.html',
         controller: 'SongCtrl'
+    }).when('/artist/:artist', {
+        templateUrl: 'app/artist/artist.html',
+        controller: 'ArtistCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -51,14 +54,12 @@ angular.module('client', [
                         callback(recent);
                     });
             }
-        },
-        watch: function() {
-            isWatching = true;
             if (!isWatching) {
+                isWatching = true;
                 socket.on('bpm', function(data) {
                     data.xmSongID = data.xmSongID.replace('#', '-');
+                    console.log('socket');
                     recent.unshift(data);
-                    $rootScope.$broadcast('bpm', data);
                 });
             }
         }

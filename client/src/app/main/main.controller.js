@@ -10,17 +10,11 @@ angular.module('client').controller('MainCtrl', function($scope, $http, $window,
         $scope.mostHeard = _.find(history, 'xmSongID', songid);
         $scope.unique24 = _.uniq(history, function(hist) { return hist.xmSongID; });
     };
-    
-    $scope.$on('bpm', function(event, data){
-        $scope.recent.unshift(data);
-        mostHeard($scope.recent);
-    });    
 
     songstream.get(function(data){
         $scope.recent = data;
         mostHeard($scope.recent);
     });
-    songstream.watch();
 
     
 });

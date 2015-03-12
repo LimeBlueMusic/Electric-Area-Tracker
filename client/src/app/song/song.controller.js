@@ -12,7 +12,7 @@ angular.module('client').controller('SongCtrl', function($scope, $http, baseURL,
             target: '#plays',
             x_accessor: 'date',
             y_accessor: 'plays',
-            full_width: true
+            full_width: true,
         });
     });
 

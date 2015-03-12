@@ -27,7 +27,11 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     });
     sstream.ensureIndex('xmSongID');
     sstream.ensureIndex('heard');
-    sstream.findOne({}, {'sort': [['$natural', -1]]}, function(err, doc){
+    sstream.findOne({}, {
+        'sort': [
+            ['$natural', -1]
+        ]
+    }, function(err, doc) {
         last = doc;
     });
 
@@ -47,7 +51,11 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     app.get('/song/:song', function*(next) {
         this.type = 'json';
         var songID = this.params.song.replace('-', '#');
-        this.body = tracks.find({xmSongID: songID}, {'limit': 1}).stream().pipe(JSONStream.stringify());
+        this.body = tracks.find({
+            xmSongID: songID
+        }, {
+            'limit': 1
+        }).stream().pipe(JSONStream.stringify());
         yield next;
     });
     app.get('/songstream/:song', function*(next) {
@@ -103,6 +111,33 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
         });
     }
 
+    function updateTrack(info) {
+        sstream.insertOne(info, function(err, r) {
+            return;
+        });
+        tracks.updateOne({
+            xmSongID: info.xmSongID
+        }, {
+            $inc: {
+                'plays': 1
+            },
+            $currentDate: {
+                lastHeard: true
+            },
+            $setOnInsert: {
+                firstHeard: moment.utc().toDate(),
+                artists: info.artists,
+                track: info.track,
+                xmSongID: info.xmSongID,
+                spotify: info.spotify
+            }
+        }, {
+            upsert: true
+        }, function(err, r) {
+            return;
+        });
+    }
+
     function newSong(artists, track, xmInfo) {
         console.log(artists);
         console.log(track);
@@ -113,39 +148,25 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
             'xmSongID': xmInfo.song.id,
             'heard': moment.utc().toDate()
         };
+        last = info;
         artists = artists.split('#')[0].replace(/[\s\/\\()]/g, '+');
         track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
-        spotify(artists, track, info, function(info) {
-            app.io.emit('bpm', info);
-            last = info;
-            sstream.insertOne(info, function(err, r) {
-                return;
-            });
-
-            // move spotify to setOnInsert
-            tracks.updateOne({
-                'xmSongID': info.xmSongID
-            }, {
-                $inc: {
-                    'plays': 1
-                },
-                $set: {
-                    spotify: info.spotify
-                },
-                $currentDate: {
-                    lastHeard: true
-                },
-                $setOnInsert: {
-                    firstHeard: moment.utc().toDate(),
-                    artists: info.artists,
-                    track: info.track,
-                    xmSongID: info.xmSongID,
-                }
-            }, {
-                upsert: true
-            }, function(err, r) {
-                return;
-            });
+        tracks.find({
+            xmSongID: info.xmSongID
+        }).limit(1).next(function(err, doc) {
+            if (doc) {
+                console.log('FOUND BITCH');
+                info.spotify = doc.spotify;
+                app.io.emit('bpm', info);
+                updateTrack(info);
+            } else {
+                console.log('new?')
+                spotify(artists, track, info, function(info) {
+                    app.io.emit('bpm', info);
+                    last = info;
+                    updateTrack(info);
+                });
+            }
         });
     }
 

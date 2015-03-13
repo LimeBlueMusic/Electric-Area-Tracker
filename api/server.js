@@ -112,6 +112,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     }
 
     function updateTrack(info) {
+        app.io.emit('bpm', info);
         sstream.insertOne(info, function(err, r) {
             return;
         });
@@ -155,14 +156,10 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
             xmSongID: info.xmSongID
         }).limit(1).next(function(err, doc) {
             if (doc) {
-                console.log('FOUND BITCH');
                 info.spotify = doc.spotify;
-                app.io.emit('bpm', info);
                 updateTrack(info);
             } else {
-                console.log('new?')
                 spotify(artists, track, info, function(info) {
-                    app.io.emit('bpm', info);
                     last = info;
                     updateTrack(info);
                 });

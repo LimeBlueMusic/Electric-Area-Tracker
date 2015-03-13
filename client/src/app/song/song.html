@@ -1,24 +1,36 @@
+<div ng-include="'/components/navbar/navbar.html'"></div>
+
+
 <div class="container">
     <div class="row">
-        <div class="col-md-6 col-md-offset-3 text-center">
-            <a href="#/" class="btn btn-large btn-default">back</a>
-            <div>
-                <small class="text-muted" am-time-ago="song.heard"></small>
-                <h3>{{song.track}}</h3>
-                <ul class="list-inline">
-                    <li ng-repeat="artist in song.artists track by $index"><a>{{artist}}</a></li>
-                </ul>
+        <div class="col-md-8 col-md-offset-2">
+
+            <div class="media">
+                <div class="media-left">
+                    <img style="height: 30%;margin-left:2px;" class="media-object" ng-src="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}">
+                </div>
+                <div class="media-body">
+                    <h3 class="media-heading">{{song.track}}</h3>
+                    <ul class="list-inline">
+                        <li ng-repeat="artist in song.artists track by $index"><a>{{artist}}</a></li>
+                    </ul>
+                    <p style="margin-top:10px;margin-bottom:10px;">
+                        <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
+                            <fa name="spotify" size="1"></fa>
+                        </a>
+                        <a ng-click="hypem(song)" target="_blank" class="btn btn-default btn-sm" role="button">
+                            <fa name="heart" size="1"></fa>
+                        </a>
+                    </p>
+                    <p>
+                        Plays: {{song.plays}}<br>
+                        First Heard: <span bs-tooltip="song.firstHeard | date" am-time-ago="song.firstHeard"></span><br>
+                        Last Heard: <span bs-tooltip="song.lastHeard | date" am-time-ago="song.lastHeard"></span>
+                    </p>
+                </div>
             </div>
-            <img ng-src="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}" class="image-responsive" width="250">
-            <p class="text-center" style="margin-top:10px;margin-bottom:10px;">
-                <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
-                    <fa name="spotify" size="1"></fa>
-                </a>
-                <a ng-click="hypem(song)" target="_blank" class="btn btn-default btn-sm" role="button">
-                    <fa name="heart" size="1"></fa>
-                </a>
-            </p>
             <div id="plays"></div>
+
         </div>
     </div>
 </div>

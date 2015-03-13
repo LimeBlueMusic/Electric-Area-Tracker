@@ -3,9 +3,9 @@
 angular.module('client', [
     'ngRoute',
     'btford.socket-io',
-    'ngEqualizer',
     'picardy.fontawesome',
     'angularMoment',
+    'mgcrea.ngStrap',
     'afkl.lazyImage'
 ]).config(function($routeProvider) {
     $routeProvider.when('/', {
@@ -32,12 +32,12 @@ angular.module('client', [
     }
 
 }).factory('baseURL', function($location) {
-    if ($location.host().split(':')[0] === 'localhost') {
+    if ($location.host().indexOf('local') !== -1) {
         return '//localhost:5000';
     } else {
         return '//backend.bpm.scttcper.com';
     }
-}).factory('songstream', function(socket, baseURL, $http, $rootScope) {
+}).factory('songstream', function(socket, baseURL, $http) {
     var recent = [];
     var isWatching = false;
     return {
@@ -58,7 +58,6 @@ angular.module('client', [
                 isWatching = true;
                 socket.on('bpm', function(data) {
                     data.xmSongID = data.xmSongID.replace('#', '-');
-                    console.log('socket');
                     recent.unshift(data);
                 });
             }

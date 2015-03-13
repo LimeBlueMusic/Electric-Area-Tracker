@@ -13,6 +13,7 @@ angular.module('client').controller('SongCtrl', function($scope, $http, baseURL,
             x_accessor: 'date',
             y_accessor: 'plays',
             full_width: true,
+            missing_is_zero: true
         });
     });
 

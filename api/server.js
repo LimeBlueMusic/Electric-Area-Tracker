@@ -2,7 +2,6 @@ var app = require('koa.io')(),
     _ = require('lodash'),
     moment = require('moment'),
     concat = require('concat-stream'),
-    router = require('koa-router'),
     https = require('https'),
     mongo = require('mongodb').MongoClient,
     JSONStream = require('JSONStream');
@@ -17,8 +16,9 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
         badIds = ['^I', ''];
 
+    app.use(require('koa-compress')());
     app.use(require('koa-cors')());
-    app.use(router(app));
+    app.use(require('koa-router')(app));
 
 
     // Setup Indexes if they don't exist
@@ -46,6 +46,11 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
                 ['$natural', -1]
             ]
         }).stream().pipe(JSONStream.stringify());
+        yield next;
+    });
+    app.get('/new', function*(next) {
+        this.type = 'json';
+        this.body = tracks.find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
         yield next;
     });
     app.get('/song/:song', function*(next) {

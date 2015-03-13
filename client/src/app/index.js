@@ -17,20 +17,16 @@ angular.module('client', [
     }).when('/artist/:artist', {
         templateUrl: 'app/artist/artist.html',
         controller: 'ArtistCtrl'
+    }).when('/new', {
+        templateUrl: 'app/new/new.html',
+        controller: 'NewCtrl'
     }).otherwise({
         redirectTo: '/'
     });
-}).factory('socket', function(socketFactory, $location) {
-    if ($location.host().split(':')[0] === 'localhost') {
-        return socketFactory({
-            ioSocket: io.connect('//localhost:5000')
-        });
-    } else {
-        return socketFactory({
-            ioSocket: io.connect('//localhost:5000')
-        });
-    }
-
+}).factory('socket', function(socketFactory, baseURL) {
+    return socketFactory({
+        ioSocket: io.connect(baseURL)
+    });
 }).factory('baseURL', function($location) {
     if ($location.host().indexOf('local') !== -1) {
         return '//localhost:5000';

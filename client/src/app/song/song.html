@@ -23,7 +23,7 @@
                         </a>
                     </p>
                     <p>
-                        Plays: {{song.plays}}<br>
+                        Plays: {{song.plays|number}}<br>
                         First Heard: <span bs-tooltip="song.firstHeard | date" am-time-ago="song.firstHeard"></span><br>
                         Last Heard: <span bs-tooltip="song.lastHeard | date" am-time-ago="song.lastHeard"></span>
                     </p>

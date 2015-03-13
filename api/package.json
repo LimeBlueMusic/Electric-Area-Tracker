@@ -17,6 +17,7 @@
     "JSONStream": "^0.10.0",
     "bson": "^0.2.19",
     "concat-stream": "^1.4.7",
+    "koa-compress": "^1.0.8",
     "koa-cors": "0.0.14",
     "koa-router": "^4.2.0",
     "koa.io": "0.0.3",

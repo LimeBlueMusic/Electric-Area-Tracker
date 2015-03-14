@@ -1,0 +1,21 @@
+server {
+    listen   80;
+
+    server_name bpm.scttcper.com www.bpm.scttcper.com;
+    access_log /home/sc/bpm_tracker/client/access.log;
+    root /home/sc/bpm_tracker/client/dist/;
+    set $host_path "/home/sc/bpm_tracker/client/dist/";
+    index index.html;
+ 
+    # SEO
+    if ($args ~ "_escaped_fragment_=/?(.+)") {
+        set $path $1;
+        rewrite ^ /snapshots/$path last;
+    }
+
+    # Re-route nested routes through index
+    location / {
+        try_files $uri $uri/ /index.html =404;
+    }
+
+}

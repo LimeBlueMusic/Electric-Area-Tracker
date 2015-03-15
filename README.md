@@ -1,5 +1,8 @@
 # bpm_tracker
-Tracking satalite radio station BPM and storing the data for later use.
+Tracking satellite radio station BPM and storing the data in mongo.
+Broken down into a AngularJS frontend and Node backend with websockets provided by koa.io.
+
+Built for io.js v1.5.1
 
 Endpoint tracked  
 ```HTTP

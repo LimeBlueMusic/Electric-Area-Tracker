@@ -1,14 +1,14 @@
-angular.module('client').directive('hypem', function () {
+angular.module('client').directive('youtube', function () {
     'use strict';
     return {
             restrict: 'A',
             scope: {
-                song: '=hypem'
+                song: '=youtube'
             },
             link: function(scope, element, attrs) {
                 if(!scope.song)return;
                 var str = scope.song.track.replace(/[\s\/()]/g, '+') + '+' + scope.song.artists.join('+').replace(/[\s\/()]/g, '+');
-                element.attr('href', 'http://hypem.com/search/'+str+'/1/?sortby=favorite');
+                element.attr('href', 'https://www.youtube.com/results?search_query='+str);
             }
         };
 });

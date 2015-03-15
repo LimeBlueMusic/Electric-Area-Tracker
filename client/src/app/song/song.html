@@ -12,14 +12,17 @@
                 <div class="media-body">
                     <h3 class="media-heading">{{song.track}}</h3>
                     <ul class="list-inline">
-                        <li ng-repeat="artist in song.artists track by $index"><a>{{artist}}</a></li>
+                        <li ng-repeat="artist in song.artists track by $index"><a href="/artists/{{artist}}">{{artist}}</a></li>
                     </ul>
-                    <p style="margin-top:10px;margin-bottom:10px;">
+                    <p style="margin-top:10px;margin-bottom:10px;" ng-if="song">
                         <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
                             <fa name="spotify" size="1"></fa>
                         </a>
                         <a hypem="song" target="_blank" class="btn btn-default btn-sm" role="button">
                             <fa name="heart" size="1"></fa>
+                        </a>
+                        <a youtube="song" target="_blank" class="btn btn-danger btn-sm" role="button">
+                            <fa name="youtube-play" size="1"></fa>
                         </a>
                     </p>
                     <p>

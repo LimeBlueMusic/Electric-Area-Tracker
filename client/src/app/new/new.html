@@ -21,7 +21,11 @@
                     <tr ng-repeat="song in week">
                         <th><img width="40" ng-src="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}"></th>
                         <th>{{song.track}}</th>
-                        <td>{{song.artists}}</td>
+                        <td>
+                            <ul class="list-inline">
+                                <li ng-repeat="artist in song.artists track by $index"><a href="/artists/{{artist}}">{{artist}}</a></li>
+                            </ul>
+                        </td>
                         <td>{{song.firstHeard | date:'short'}}</td>
                         <td>{{song.plays}}</td>
                         <td>
@@ -32,7 +36,10 @@
                                 <a hypem="song" target="_blank" class="btn btn-default btn-sm" role="button">
                                     <fa name="heart" size="1"></fa>
                                 </a>
-                                <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
+                                <a youtube="song" target="_blank" class="btn btn-danger btn-sm" role="button">
+                                    <fa name="youtube-play" size="1"></fa>
+                                </a>
+                                <a ng-show="song.spotify.album_image" ng-href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
                                     <fa name="spotify" size="1"></fa>
                                 </a>
                             </p>

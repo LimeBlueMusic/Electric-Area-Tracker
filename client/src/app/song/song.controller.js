@@ -1,7 +1,6 @@
 'use strict';
 
 angular.module('client').controller('SongCtrl', function($scope, $http, baseURL, $routeParams) {
-    $scope.song = $routeParams.song;
     $http.get(baseURL + '/songstream/' + $routeParams.song.replace('#', '-')).success(function(data) {
         var parseddata = _.map(data, function(n){
             var stringdate = n._id.year + '-' + n._id.month + '-' + n._id.day;

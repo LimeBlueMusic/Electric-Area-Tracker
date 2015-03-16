@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "JSONStream": "^0.10.0",
-    "bson": "^0.2.19",
+    "bson": "^0.2.20",
     "concat-stream": "^1.4.7",
     "koa-compress": "^1.0.8",
     "koa-cors": "0.0.14",

@@ -1,0 +1,14 @@
+<div ng-controller="LinksCtrl">
+    <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
+        <fa name="spotify" size="1"></fa>
+    </a>
+    <a ng-href="{{hypem(song)}}" target="_blank" class="btn btn-default btn-sm" role="button">
+        <fa name="heart" size="1"></fa>
+    </a>
+    <a ng-href="{{youtube(song)}}" target="_blank" class="btn btn-danger btn-sm" role="button">
+        <fa name="youtube-play" size="1"></fa>
+    </a>
+    <a ng-href="#/song/{{song.xmSongID}}" class="btn btn-default btn-sm btn-info" role="button">
+        <fa name="info-circle" size="1"></fa>
+    </a>
+</div>

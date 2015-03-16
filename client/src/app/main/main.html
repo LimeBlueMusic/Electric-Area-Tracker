@@ -13,15 +13,7 @@
                     <ul class="list-inline">
                         <li ng-repeat="artist in mostHeard.artists track by $index"><small>{{artist}}</small></li>
                     </ul>
-                    <a ng-show="mostHeard.spotify.album_image" href="{{mostHeard.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
-                        <fa name="spotify" size="1"></fa>
-                    </a>
-                    <a ng-href="http://hypem.com/search/{{mostHeard.hypem}}/1/?sortby=favorite" target="_blank" class="btn btn-default btn-sm" role="button">
-                        <fa name="heart" size="1"></fa>
-                    </a>
-                    <a ng-href="#/song/{{mostHeard.xmSongID}}" class="btn btn-default btn-sm btn-info" role="button">
-                        <fa name="info-circle" size="1"></fa>
-                    </a>
+                    <div ng-if="mostHeard" ng-include="'app/main/links.html'" onload="song = mostHeard"></div>
                 </div>
             </div>
         </div>
@@ -57,20 +49,7 @@
                             </ul>
                         </div>
                         <div>
-                            <p class="text-center">
-                                <a ng-show="song.spotify.album_image" href="{{song.spotify.url}}" target="_blank" class="btn btn-success btn-sm" role="button">
-                                    <fa name="spotify" size="1"></fa>
-                                </a>
-                                <a hypem="song" target="_blank" class="btn btn-default btn-sm" role="button">
-                                    <fa name="heart" size="1"></fa>
-                                </a>
-                                <a youtube="song" target="_blank" class="btn btn-danger btn-sm" role="button">
-                                    <fa name="youtube-play" size="1"></fa>
-                                </a>
-                                <a ng-href="#/song/{{song.xmSongID}}" class="btn btn-default btn-sm btn-info" role="button">
-                                    <fa name="info-circle" size="1"></fa>
-                                </a>
-                            </p>
+                            <p class="text-center" ng-include="'app/main/links.html'"></p>
                         </div>
                     </div>
                 </div>

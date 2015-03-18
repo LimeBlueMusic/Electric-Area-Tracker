@@ -23,7 +23,7 @@
         "module": "ngRoute"
       },
       "ui": {
-        "name": "bootstrap-sass-official",
+        "name": "bootstrap",
         "version": "~3.3.1",
         "key": "bootstrap",
         "module": null

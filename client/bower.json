@@ -4,7 +4,7 @@
   "dependencies": {
     "angular-route": "~1.3.4",
     "bootstrap": "~3.3.4",
-    "angular-strap": "2.1.x",
+    "angular-strap": "~2.2.1",
     "angular": "~1.3.4",
     "angular-socket-io": "~0.7.0",
     "angular-equalizer": "~1.0.1",

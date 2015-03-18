@@ -5,14 +5,13 @@
     <div class="row">
         <div class="col-md-12">
 
-            <h1>Newest</h1>
+            <h1>Newest Last 7 Days</h1>
             <table class="table table-condensed">
                 <thead>
                     <tr>
                         <th></th>
                         <th>Track</th>
                         <th>Artists</th>
-                        <th>First Heard</th>
                         <th>Plays</th>
                         <th>Links</th>
                     </tr>
@@ -26,8 +25,7 @@
                                 <li ng-repeat="artist in song.artists track by $index"><a href="/artists/{{artist}}">{{artist}}</a></li>
                             </ul>
                         </td>
-                        <td>{{song.firstHeard | date:'short'}}</td>
-                        <td>{{song.plays}}</td>
+                        <td>{{song.count}}</td>
                         <td>
                             <p ng-include="'app/main/links.html'"></p>
                         </td>

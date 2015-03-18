@@ -19,6 +19,11 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     app.use(require('koa-compress')());
     app.use(require('koa-cors')());
     app.use(require('koa-router')(app));
+    // json middleware
+    app.use(function*(next) {
+        this.type = 'json';
+        yield next;
+    });
 
     // setup last
     tracks.find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
@@ -27,7 +32,6 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
 
     // routes
     app.get('/recentBPM', function*(next) {
-        this.type = 'json';
         this.body = sstream.find({
             heard: {
                 $gt: moment().subtract(1, 'days').toDate()
@@ -36,26 +40,30 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
         yield next;
     });
     app.get('/new', function*(next) {
-        this.type = 'json';
         this.body = tracks.find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
         yield next;
     });
+    app.get('/mostHeard', function*(next) {
+        this.body = sstream.aggregate([
+            {$match: {heard: {$gt: moment().subtract(7, 'days').toDate()}}},
+            {$group: {_id: '$xmSongID',count: {$sum: 1},track: {$first: '$track'},spotify: {$first: '$spotify'},artists: {$first: '$artists'},heard: {$first: '$heard'}}},
+            {$sort: {count: -1}},
+            {$limit: 100}
+        ]).stream().pipe(JSONStream.stringify());
+        yield next;
+    });
     app.get('/artist/:artist', function*(next) {
-        this.type = 'json';
-        console.log(this.params.artist);
         this.body = tracks.find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
         yield next;
     });
     app.get('/song/:song', function*(next) {
-        this.type = 'json';
         var songID = this.params.song.replace('-', '#');
         this.body = tracks.find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
         yield next;
     });
     app.get('/songstream/:song', function*(next) {
-        this.type = 'json';
         var songID = this.params.song.replace('-', '#');
-        this.body = db.collection('stream').aggregate([{
+        this.body = sstream.aggregate([{
             $match: {
                 xmSongID: songID
             }
@@ -148,7 +156,6 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
                 updateTrack(info);
             } else {
                 spotify(artists, track, info, function(info) {
-                    last = info;
                     updateTrack(info);
                 });
             }
@@ -179,7 +186,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
             }));
         });
     }
-    setInterval(checkEndpoint, 15 * 1000);
+    setInterval(checkEndpoint, 20 * 1000);
 
     app.listen(5000);
 });

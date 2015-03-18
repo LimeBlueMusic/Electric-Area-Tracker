@@ -20,6 +20,9 @@ angular.module('client', [
     }).when('/new', {
         templateUrl: 'app/new/new.html',
         controller: 'NewCtrl'
+    }).when('/mostPlayed', {
+        templateUrl: 'app/mostplayed/mostplayed.html',
+        controller: 'MostPlayedCtrl'
     }).otherwise({
         redirectTo: '/'
     });

@@ -21,7 +21,7 @@ angular.module('client', [
         templateUrl: 'app/new/new.html',
         controller: 'NewCtrl'
     }).when('/mostPlayed', {
-        templateUrl: 'app/mostplayed/mostplayed.html',
+        templateUrl: 'app/mostPlayed/mostplayed.html',
         controller: 'MostPlayedCtrl'
     }).otherwise({
         redirectTo: '/'

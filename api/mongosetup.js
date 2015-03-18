@@ -7,6 +7,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     tracks.ensureIndex('xmSongID', {
         unique: true
     });
+    tracks.ensureIndex('artists');
     sstream.ensureIndex('xmSongID');
     sstream.ensureIndex('heard');
 });

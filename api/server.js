@@ -26,7 +26,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     });
 
     // setup last
-    tracks.find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
+    tracks.find().sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;
     });
 

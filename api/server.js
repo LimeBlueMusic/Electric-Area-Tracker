@@ -46,7 +46,14 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     app.get('/mostHeard', function*(next) {
         this.body = sstream.aggregate([
             {$match: {heard: {$gt: moment().subtract(7, 'days').toDate()}}},
-            {$group: {_id: '$xmSongID',count: {$sum: 1},track: {$first: '$track'},spotify: {$first: '$spotify'},artists: {$first: '$artists'},heard: {$first: '$heard'}}},
+            {$group: {
+                _id: '$xmSongID',
+                count: {$sum: 1},
+                xmSongID: {$first: '$xmSongID'},
+                track: {$first: '$track'},
+                spotify: {$first: '$spotify'},
+                artists: {$first: '$artists'},
+                heard: {$first: '$heard'}}},
             {$sort: {count: -1}},
             {$limit: 100}
         ]).stream().pipe(JSONStream.stringify());

@@ -6,95 +6,104 @@ var app = require('koa.io')(),
     mongo = require('mongodb').MongoClient,
     JSONStream = require('JSONStream');
 
+
+var sstream, tracks;
+var last = {},
+    currentevent;
+
+// http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
+var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
+    badIds = ['^I', ''];
+
+app.use(require('koa-compress')());
+app.use(require('koa-cors')());
+app.use(require('koa-router')(app));
+// json middleware
+app.use(function*(next) {
+    this.type = 'json';
+    yield next;
+});
+app.get('/recentBPM', recentBPM);
+app.get('/new', newsongs);
+app.get('/mostHeard', mostHeard);
+app.get('/artist/:artist', artists);
+app.get('/song/:song', song);
+app.get('/songstream/:song', songstream);
+
+// routes
+function* recentBPM(next){
+    this.body = sstream.find({
+        heard: {$gt: moment().subtract(1, 'days').toDate()}
+    }).sort({$natural: -1}).stream().pipe(JSONStream.stringify());
+    yield next;
+}
+function* newsongs(next){
+    this.body = tracks.find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
+    yield next;
+}
+function* mostHeard(next){
+    this.body = sstream.aggregate([
+        {$match: {heard: {$gt: moment().subtract(7, 'days').toDate()}}},
+        {$group: {
+            _id: '$xmSongID',
+            count: {$sum: 1},
+            xmSongID: {$first: '$xmSongID'},
+            track: {$first: '$track'},
+            spotify: {$first: '$spotify'},
+            artists: {$first: '$artists'},
+            heard: {$first: '$heard'}}},
+        {$sort: {count: -1}},
+        {$limit: 100}
+    ]).stream().pipe(JSONStream.stringify());
+    yield next;
+}
+function* artists(next){
+    console.log(this.params.artist);
+    this.body = tracks.find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
+    yield next; 
+}
+function* song(next){
+    var songID = this.params.song.replace('-', '#');
+    this.body = tracks.find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
+    yield next;
+}
+function* songstream(next){
+    var songID = this.params.song.replace('-', '#');
+    this.body = sstream.aggregate([{
+        $match: {
+            xmSongID: songID
+        }
+    }, {
+        $group: {
+            _id: {
+                month: {
+                    $month: '$heard'
+                },
+                day: {
+                    $dayOfMonth: '$heard'
+                },
+                year: {
+                    $year: '$heard'
+                }
+            },
+            count: {
+                $sum: 1
+            }
+        }
+    }]).stream().pipe(JSONStream.stringify());
+    yield next;
+}
+
 mongo.connect('mongodb://localhost/bpm', function(err, db) {
-    var sstream = db.collection('stream');
-    var tracks = db.collection('tracks');
-    var last = {},
-        currentevent;
-
-    // http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
-    var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
-        badIds = ['^I', ''];
-
-    app.use(require('koa-compress')());
-    app.use(require('koa-cors')());
-    app.use(require('koa-router')(app));
-    // json middleware
-    app.use(function*(next) {
-        this.type = 'json';
+    app.use(function* (next){
+        this.db = db;
         yield next;
     });
-
-    // setup last
-    tracks.find().sort({$natural: -1}).limit(1).next(function(err, doc) {
+    sstream = db.collection('stream');
+    tracks = db.collection('tracks');
+    sstream.find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;
     });
-
-    // routes
-    app.get('/recentBPM', function*(next) {
-        this.body = sstream.find({
-            heard: {
-                $gt: moment().subtract(1, 'days').toDate()
-            }
-        }).sort({$natural: -1}).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-    app.get('/new', function*(next) {
-        this.body = tracks.find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-    app.get('/mostHeard', function*(next) {
-        this.body = sstream.aggregate([
-            {$match: {heard: {$gt: moment().subtract(7, 'days').toDate()}}},
-            {$group: {
-                _id: '$xmSongID',
-                count: {$sum: 1},
-                xmSongID: {$first: '$xmSongID'},
-                track: {$first: '$track'},
-                spotify: {$first: '$spotify'},
-                artists: {$first: '$artists'},
-                heard: {$first: '$heard'}}},
-            {$sort: {count: -1}},
-            {$limit: 100}
-        ]).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-    app.get('/artist/:artist', function*(next) {
-        this.body = tracks.find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-    app.get('/song/:song', function*(next) {
-        var songID = this.params.song.replace('-', '#');
-        this.body = tracks.find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-    app.get('/songstream/:song', function*(next) {
-        var songID = this.params.song.replace('-', '#');
-        this.body = sstream.aggregate([{
-            $match: {
-                xmSongID: songID
-            }
-        }, {
-            $group: {
-                _id: {
-                    month: {
-                        $month: '$heard'
-                    },
-                    day: {
-                        $dayOfMonth: '$heard'
-                    },
-                    year: {
-                        $year: '$heard'
-                    }
-                },
-                count: {
-                    $sum: 1
-                }
-            }
-        }]).stream().pipe(JSONStream.stringify());
-        yield next;
-    });
-
     function spotify(artists, track, info, callback) {
         var query = 'artist:' + artists + '+track:' + track + '&type=track';
         console.log('https://api.spotify.com/v1/search?query=' + query);
@@ -123,15 +132,10 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
     function updateTrack(info) {
         app.io.emit('bpm', info);
         sstream.insert(info);
-        tracks.update({
-            xmSongID: info.xmSongID
-        }, {
-            $inc: {
-                'plays': 1
-            },
-            $currentDate: {
-                lastHeard: true
-            },
+        tracks.update({xmSongID: info.xmSongID},
+        {
+            $inc: {'plays': 1},
+            $currentDate: {lastHeard: true},
             $setOnInsert: {
                 firstHeard: moment.utc().toDate(),
                 artists: info.artists,
@@ -194,6 +198,5 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
         });
     }
     setInterval(checkEndpoint, 20 * 1000);
-
     app.listen(5000);
 });

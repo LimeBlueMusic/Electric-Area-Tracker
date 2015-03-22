@@ -7,9 +7,9 @@ var app = require('koa.io')(),
     JSONStream = require('JSONStream');
 
 
-var sstream, tracks;
 var last = {},
-    currentevent;
+    currentevent,
+    db;
 
 // http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
 var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
@@ -32,17 +32,17 @@ app.get('/songstream/:song', songstream);
 
 // routes
 function* recentBPM(next){
-    this.body = sstream.find({
+    this.body = db.collection('stream').find({
         heard: {$gt: moment().subtract(1, 'days').toDate()}
     }).sort({$natural: -1}).stream().pipe(JSONStream.stringify());
     yield next;
 }
 function* newsongs(next){
-    this.body = tracks.find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
+    this.body = db.collection('tracks').find({}).sort({$natural: -1}).limit(100).stream().pipe(JSONStream.stringify());
     yield next;
 }
 function* mostHeard(next){
-    this.body = sstream.aggregate([
+    this.body = db.collection('stream').aggregate([
         {$match: {heard: {$gt: moment().subtract(7, 'days').toDate()}}},
         {$group: {
             _id: '$xmSongID',
@@ -59,17 +59,17 @@ function* mostHeard(next){
 }
 function* artists(next){
     console.log(this.params.artist);
-    this.body = tracks.find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
+    this.body = db.collection('tracks').find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
     yield next; 
 }
 function* song(next){
     var songID = this.params.song.replace('-', '#');
-    this.body = tracks.find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
+    this.body = db.collection('tracks').find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
     yield next;
 }
 function* songstream(next){
     var songID = this.params.song.replace('-', '#');
-    this.body = sstream.aggregate([{
+    this.body = db.collection('stream').aggregate([{
         $match: {
             xmSongID: songID
         }
@@ -94,14 +94,9 @@ function* songstream(next){
     yield next;
 }
 
-mongo.connect('mongodb://localhost/bpm', function(err, db) {
-    app.use(function* (next){
-        this.db = db;
-        yield next;
-    });
-    sstream = db.collection('stream');
-    tracks = db.collection('tracks');
-    sstream.find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
+mongo.connect('mongodb://localhost/bpm', function(err, conn) {
+    db = conn;
+    db.collection('stream').find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;
     });
     function spotify(artists, track, info, callback) {
@@ -131,8 +126,8 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
 
     function updateTrack(info) {
         app.io.emit('bpm', info);
-        sstream.insert(info);
-        tracks.update({xmSongID: info.xmSongID},
+        db.collection('stream').insert(info);
+        db.collection('tracks').update({xmSongID: info.xmSongID},
         {
             $inc: {'plays': 1},
             $currentDate: {lastHeard: true},
@@ -161,7 +156,7 @@ mongo.connect('mongodb://localhost/bpm', function(err, db) {
         last = info;
         artists = artists.split('#')[0].replace(/[\s\/\\()]/g, '+');
         track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
-        tracks.find({xmSongID: info.xmSongID}).limit(1).next(function(err, doc) {
+        db.collection('tracks').find({xmSongID: info.xmSongID}).limit(1).next(function(err, doc) {
             if (doc) {
                 info.spotify = doc.spotify;
                 updateTrack(info);

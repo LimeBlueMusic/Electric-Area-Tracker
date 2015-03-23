@@ -17,6 +17,9 @@ angular.module('client', [
     }).when('/artist/:artist', {
         templateUrl: 'app/artist/artist.html',
         controller: 'ArtistCtrl'
+    }).when('/artists', {
+        templateUrl: 'app/artist/artists.html',
+        controller: 'ArtistsCtrl'
     }).when('/new', {
         templateUrl: 'app/new/new.html',
         controller: 'NewCtrl'

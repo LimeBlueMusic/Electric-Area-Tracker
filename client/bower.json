@@ -10,17 +10,10 @@
     "angular-equalizer": "~1.0.1",
     "lodash": "~3.5.0",
     "angular-fontawesome": "~0.3.2",
-    "angular-moment": "~0.9.0",
+    "angular-moment": "~0.9.2",
     "angular-motion": "~0.3.4",
     "metrics-graphics": "~2.2.1",
     "afkl-lazy-image": "~0.0.12",
     "bb-equalizer": "~1.0.17"
-  },
-  "devDependencies": {
-    "angular-mocks": "~1.3.4"
-  },
-  "resolutions": {
-    "lodash": "~3.5.0",
-    "angular": "~1.3.15"
   }
 }

@@ -45,7 +45,7 @@
                             <small class="text-muted" am-time-ago="song.heard"></small>
                             <h5>{{song.track}}</h5>
                             <ul class="list-inline">
-                                <li ng-repeat="artist in song.artists track by $index"><a><small>{{artist}}</small></a></li>
+                                <li ng-repeat="artist in song.artists track by $index"><a ng-href="#/artist/{{artist}}"><small>{{artist}}</small></a></li>
                             </ul>
                         </div>
                         <div>

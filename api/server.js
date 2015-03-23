@@ -26,6 +26,7 @@ app.use(function*(next) {
 app.get('/recentBPM', recentBPM);
 app.get('/new', newsongs);
 app.get('/mostHeard', mostHeard);
+app.get('/artists', allArtists);
 app.get('/artist/:artist', artists);
 app.get('/song/:song', song);
 app.get('/songstream/:song', songstream);
@@ -61,6 +62,15 @@ function* artists(next){
     console.log(this.params.artist);
     this.body = db.collection('tracks').find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
     yield next; 
+}
+function distinctArtists(callback){
+    db.collection('tracks').distinct('artists', function(err, doc){
+        callback(null, doc);
+    });
+}
+function* allArtists(next){
+    // i may be doing this wrong, but it works
+    this.body = yield distinctArtists;
 }
 function* song(next){
     var songID = this.params.song.replace('-', '#');

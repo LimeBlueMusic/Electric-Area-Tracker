@@ -1,1 +1,31 @@
-hilo
+<div ng-include="'app/navbar/navbar.html'"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <legend><h3>{{artist}}</h3></legend>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-sm-3" ng-repeat="song in songs track by $index">
+                    <div class="thumbnail" bb-equalizer>
+                        <div class="afkl-lazy-wrapper" afkl-lazy-image="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}"></div>
+                        <div class="caption" bb-equalizer-part="group">
+                            <small class="text-muted">Plays: {{song.plays}}</small>
+                            <h5>{{song.track}}</h5>
+                            <ul class="list-inline">
+                                <li ng-repeat="artist in song.artists track by $index"><a ng-href="#/artist/{{artist}}"><small>{{artist}}</small></a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-center" ng-include="'app/main/links.html'"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

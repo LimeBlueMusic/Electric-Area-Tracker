@@ -2,17 +2,16 @@
   "name": "client",
   "version": "0.0.0",
   "dependencies": {
-    "angular-route": "~1.3.4",
+    "angular": "1.4",
+    "angular-route": "1.4",
     "bootstrap": "~3.3.4",
     "angular-strap": "~2.2.1",
-    "angular": "~1.3.4",
     "angular-socket-io": "~0.7.0",
     "angular-equalizer": "~1.0.1",
     "lodash": "~3.5.0",
     "angular-fontawesome": "~0.3.2",
     "angular-moment": "~0.9.0",
     "angular-motion": "~0.3.4",
-    "angular-animate": "~1.3.14",
     "metrics-graphics": "~2.2.1",
     "afkl-lazy-image": "~0.0.12",
     "bb-equalizer": "~1.0.17"
@@ -21,6 +20,7 @@
     "angular-mocks": "~1.3.4"
   },
   "resolutions": {
-    "lodash": "~3.5.0"
+    "lodash": "~3.5.0",
+    "angular": "~1.3.15"
   }
 }

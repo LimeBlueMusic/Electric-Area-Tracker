@@ -6,7 +6,7 @@ upstream bpm_backend {
 # the nginx server instance
 server {
     listen 0.0.0.0:80;
-    server_name api.bpm.scttcper.com;
+    server_name bpmbackend.scttcper.com;
     access_log /home/sc/bpm_tracker/access.log;
 
     # pass the request to the node.js server with the correct headers and much more can be added, see nginx config options

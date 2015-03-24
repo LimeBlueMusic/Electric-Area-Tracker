@@ -37,7 +37,7 @@ angular.module('client', [
     if ($location.host().indexOf('local') !== -1) {
         return '//localhost:5000';
     } else {
-        return '//api.bpm.scttcper.com';
+        return '//bpmbackend.scttcper.com';
     }
 }).factory('songstream', function(socket, baseURL, $http) {
     var recent = [];

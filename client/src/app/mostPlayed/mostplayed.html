@@ -22,11 +22,11 @@
                         <th>{{song.track}}</th>
                         <td>
                             <ul class="list-inline">
-                                <li ng-repeat="artist in song.artists track by $index"><a href="#/artist/{{artist}}">{{artist}}</a></li>
+                                <li ng-repeat="artist in song.artists track by $index"><a href="#/artist/{{artist}}" class="text-nowrap">{{artist}}</a></li>
                             </ul>
                         </td>
                         <td>{{song.count}}</td>
-                        <td>
+                        <td class="text-nowrap">
                             <p ng-include="'app/main/links.html'"></p>
                         </td>
                     </tr>

@@ -27,7 +27,12 @@ module.exports = function(options) {
 
     var wiredepOptions = {
       directory: 'bower_components',
-      exclude: [/bootstrap\.js/]
+      exclude: [/bootstrap\.js/],
+      overrides: {
+        'socket.io-client': {
+          main: 'socket.io.js'
+        }
+      }
     };
 
     return gulp.src(options.src + '/*.html')

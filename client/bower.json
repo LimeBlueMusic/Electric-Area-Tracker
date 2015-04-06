@@ -14,6 +14,7 @@
     "angular-motion": "~0.3.4",
     "metrics-graphics": "~2.2.1",
     "afkl-lazy-image": "~0.0.12",
-    "bb-equalizer": "~1.0.17"
+    "bb-equalizer": "~1.0.17",
+    "socket.io-client": "~1.3.5"
   }
 }

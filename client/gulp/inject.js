@@ -2,44 +2,43 @@
 
 var gulp = require('gulp');
 
+var paths = gulp.paths;
+
 var $ = require('gulp-load-plugins')();
 
 var wiredep = require('wiredep').stream;
 
-module.exports = function(options) {
-  gulp.task('inject', ['scripts'], function () {
-    var injectStyles = gulp.src([
-      options.src + '/{app,components}/**/*.css'
-    ], { read: false });
+gulp.task('inject', function () {
 
+  var injectStyles = gulp.src([
+    paths.src + '/{app,components}/**/*.css'
+  ], { read: false });
 
-    var injectScripts = gulp.src([
-      options.src + '/{app,components}/**/*.js',
-      '!' + options.src + '/{app,components}/**/*.spec.js',
-      '!' + options.src + '/{app,components}/**/*.mock.js'
-    ])
-    .pipe($.angularFilesort()).on('error', options.errorHandler('AngularFilesort'));
+  var injectScripts = gulp.src([
+    paths.src + '/{app,components}/**/*.js',
+    '!' + paths.src + '/{app,components}/**/*.spec.js',
+    '!' + paths.src + '/{app,components}/**/*.mock.js'
+  ]).pipe($.angularFilesort());
 
-    var injectOptions = {
-      ignorePath: [options.src, options.tmp + '/serve'],
-      addRootSlash: false
-    };
+  var injectOptions = {
+    ignorePath: [paths.src, paths.tmp + '/serve'],
+    addRootSlash: false
+  };
 
-    var wiredepOptions = {
-      directory: 'bower_components',
-      exclude: [/bootstrap\.js/],
-      overrides: {
-        'socket.io-client': {
-          main: 'socket.io.js'
-        }
+  var wiredepOptions = {
+    directory: 'bower_components',
+    exclude: [/bootstrap\.js/, /jquery\.js/],
+    overrides: {
+      'socket.io-client': {
+        main: 'socket.io.js'
       }
-    };
+    }
+  };
 
-    return gulp.src(options.src + '/*.html')
-      .pipe($.inject(injectStyles, injectOptions))
-      .pipe($.inject(injectScripts, injectOptions))
-      .pipe(wiredep(wiredepOptions))
-      .pipe(gulp.dest(options.tmp + '/serve'));
+  return gulp.src(paths.src + '/*.html')
+    .pipe($.inject(injectStyles, injectOptions))
+    .pipe($.inject(injectScripts, injectOptions))
+    .pipe(wiredep(wiredepOptions))
+    .pipe(gulp.dest(paths.tmp + '/serve'));
 
-  });
-};
+});

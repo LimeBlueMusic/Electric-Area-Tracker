@@ -4,7 +4,8 @@ var app = require('koa.io')(),
     concat = require('concat-stream'),
     https = require('https'),
     mongo = require('mongodb').MongoClient,
-    JSONStream = require('JSONStream');
+    JSONStream = require('JSONStream'),
+    config = require('./config');
 
 
 var last = {},
@@ -104,7 +105,7 @@ function* songstream(next){
     yield next;
 }
 
-mongo.connect('mongodb://localhost/bpm', function(err, conn) {
+mongo.connect(config.db, function(err, conn) {
     db = conn;
     db.collection('stream').find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;

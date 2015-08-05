@@ -5,6 +5,7 @@ var app = require('koa.io')(),
     https = require('https'),
     mongo = require('mongodb').MongoClient,
     JSONStream = require('JSONStream'),
+    route = require('koa-route'),
     config = require('./config');
 
 
@@ -18,19 +19,18 @@ var sirius = '/metadata/pdt/en-us/json/channels/thebeat/timestamp/',
 
 app.use(require('koa-compress')());
 app.use(require('koa-cors')());
-app.use(require('koa-router')(app));
 // json middleware
 app.use(function*(next) {
     this.type = 'json';
     yield next;
 });
-app.get('/recentBPM', recentBPM);
-app.get('/new', newsongs);
-app.get('/mostHeard', mostHeard);
-app.get('/artists', allArtists);
-app.get('/artist/:artist', artists);
-app.get('/song/:song', song);
-app.get('/songstream/:song', songstream);
+app.use(route.get('/recentBPM', recentBPM));
+app.use(route.get('/new', newsongs));
+app.use(route.get('/mostHeard', mostHeard));
+app.use(route.get('/artists', allArtists));
+app.use(route.get('/artist/:artist', artists));
+app.use(route.get('/song/:song', songFromID));
+app.use(route.get('/songstream/:song', songstream));
 
 // routes
 function* recentBPM(next){
@@ -59,9 +59,9 @@ function* mostHeard(next){
     ]).stream().pipe(JSONStream.stringify());
     yield next;
 }
-function* artists(next){
+function* artists(artist, next){
     console.log(this.params.artist);
-    this.body = db.collection('tracks').find({artists: this.params.artist}).stream().pipe(JSONStream.stringify());
+    this.body = db.collection('tracks').find({artists: artist}).stream().pipe(JSONStream.stringify());
     yield next; 
 }
 function distinctArtists(callback){
@@ -73,13 +73,12 @@ function* allArtists(next){
     // i may be doing this wrong, but it works
     this.body = yield distinctArtists;
 }
-function* song(next){
-    var songID = this.params.song.replace('-', '#');
-    this.body = db.collection('tracks').find({xmSongID: songID}).limit(1).stream().pipe(JSONStream.stringify());
+function* songFromID(song, next){
+    this.body = db.collection('tracks').find({xmSongID: song.replace('-', '#')}).limit(1).stream().pipe(JSONStream.stringify());
     yield next;
 }
-function* songstream(next){
-    var songID = this.params.song.replace('-', '#');
+function* songstream(song, next){
+    var songID = song.replace('-', '#');
     this.body = db.collection('stream').aggregate([{
         $match: {
             xmSongID: songID
@@ -105,8 +104,7 @@ function* songstream(next){
     yield next;
 }
 
-mongo.connect(config.db, function(err, conn) {
-    db = conn;
+mongo.connect(config.db, function(err, db) {
     db.collection('stream').find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;
     });

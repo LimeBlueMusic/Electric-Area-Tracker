@@ -14,15 +14,15 @@
   "author": "scttcper",
   "license": "MIT",
   "dependencies": {
-    "JSONStream": "^0.10.0",
-    "bson": "^0.2.20",
-    "concat-stream": "^1.4.7",
+    "JSONStream": "^1.0.4",
+    "bson": "^0.2.22",
+    "concat-stream": "^1.5.0",
     "koa-compress": "^1.0.8",
-    "koa-cors": "0.0.14",
-    "koa-router": "^4.2.0",
+    "koa-cors": "0.0.16",
+    "koa-route": "^2.4.2",
     "koa.io": "0.0.3",
-    "lodash": "^3.5.0",
-    "moment": "^2.9.0",
+    "lodash": "^3.10.1",
+    "moment": "^2.10.6",
     "mongodb": "^2.0"
   }
 }

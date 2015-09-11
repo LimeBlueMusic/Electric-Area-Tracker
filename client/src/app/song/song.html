@@ -1,29 +1,25 @@
-<div ng-include="'app/navbar/navbar.html'"></div>
-
+<bpm-nav></bpm-nav>
 
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-
-            <div class="media">
-                <div class="media-left">
-                    <img style="height: 30%;margin-left:2px;" class="media-object" ng-src="{{song.spotify.album_image || 'assets/images/album_placeholder.jpg'}}">
-                </div>
-                <div class="media-body">
-                    <h3 class="media-heading">{{song.track}}</h3>
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="card">
+                <img width="100%" ng-src="{{vm.song.spotify.album_image || './assets/images/album_placeholder.jpg'}}" >
+                <div class="card-block">
+                    <p class="card-text"><small class="text-muted">First: {{vm.song.firstHeard | contextualDate}}</small> - <small class="text-muted">Last: {{vm.song.lastHeard | contextualDate}}</small></p>
+                    <p class="card-text"></p>
+                    <h6 class="card-title">{{vm.song.track}}</h6>
                     <ul class="list-inline">
-                        <li ng-repeat="artist in song.artists track by $index"><a href="/artists/{{artist}}">{{artist}}</a></li>
+                        <li ng-repeat="artist in vm.song.artists track by $index">
+                            <a ng-href="#/artist/{{artist}}">
+                                <small>{{artist}}</small>
+                            </a>
+                        </li>
                     </ul>
-                    <p ng-include="'app/main/links.html'"></p>
-                    <p>
-                        Plays: {{song.plays|number}}<br>
-                        First Heard: <span bs-tooltip="song.firstHeard | date" am-time-ago="song.firstHeard"></span><br>
-                        Last Heard: <span bs-tooltip="song.lastHeard | date" am-time-ago="song.lastHeard"></span>
-                    </p>
+                    <bpm-links song="song" align="center"></bpm-links>
                 </div>
+                <div id="plays" style="margin-bottom: -6px"></div>
             </div>
-            <div id="plays"></div>
-
         </div>
     </div>
 </div>

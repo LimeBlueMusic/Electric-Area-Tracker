@@ -1,16 +1,34 @@
-'use strict';
+class MainController {
+  constructor ($timeout, webDevTec, toastr) {
+    'ngInject';
 
-angular.module('client').controller('MainCtrl', function($scope, $http, $window, socket, songstream) {
-    var mostHeard = function(history){
-        var songid = _.chain(history).pluck('xmSongID').countBy().pairs().max(_.last).first().value();
-        $scope.mostHeard = _.find(history, 'xmSongID', songid);
-        $scope.unique24 = _.uniq(history, function(hist) { return hist.xmSongID; });
-    };
+    this.awesomeThings = [];
+    this.classAnimation = '';
+    this.creationDate = 1441688247624;
+    this.toastr = toastr;
 
-    songstream.get(function(data){
-        $scope.recent = data;
-        mostHeard($scope.recent);
+    this.activate($timeout, webDevTec);
+  }
+
+  activate($timeout, webDevTec) {
+    this.getWebDevTec(webDevTec);
+    $timeout(() => {
+      this.classAnimation = 'rubberBand';
+    }, 4000);
+  }
+
+  getWebDevTec(webDevTec) {
+    this.awesomeThings = webDevTec.getTec();
+
+    angular.forEach(this.awesomeThings, (awesomeThing) => {
+      awesomeThing.rank = Math.random();
     });
+  }
 
-    
-});
+  showToastr() {
+    this.toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
+    this.classAnimation = '';
+  }
+}
+
+export default MainController;

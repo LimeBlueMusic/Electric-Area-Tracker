@@ -1,49 +1,67 @@
 'use strict';
 
+var path = require('path');
 var gulp = require('gulp');
+var conf = require('./conf');
 
-var paths = gulp.paths;
+var browserSync = require('browser-sync');
+var webpack = require('webpack-stream');
 
 var $ = require('gulp-load-plugins')();
 
-gulp.task('styles', function () {
-
-  var sassOptions = {
-    style: 'expanded'
-  };
-
-  var injectFiles = gulp.src([
-    paths.src + '/{app,components}/**/*.scss',
-    '!' + paths.src + '/app/index.scss',
-    '!' + paths.src + '/app/vendor.scss'
-  ], { read: false });
-
-  var injectOptions = {
-    transform: function(filePath) {
-      filePath = filePath.replace(paths.src + '/app/', '');
-      filePath = filePath.replace(paths.src + '/components/', '../components/');
-      return '@import \'' + filePath + '\';';
+function webpackWrapper(watch, test, callback) {
+  var webpackOptions = {
+    watch: watch,
+    module: {
+      preLoaders: [{ test: /\.js$/, exclude: /node_modules/, loader: 'eslint-loader'}],
+      loaders: [{ test: /\.js$/, exclude: /node_modules/, loaders: ['ng-annotate', 'babel-loader']}]
     },
-    starttag: '// injector',
-    endtag: '// endinjector',
-    addRootSlash: false
+    output: { filename: 'index.module.js' }
   };
 
-  var indexFilter = $.filter('index.scss');
+  if(watch) {
+    webpackOptions.devtool = 'inline-source-map';
+  }
 
-  return gulp.src([
-    paths.src + '/app/index.scss',
-    paths.src + '/app/vendor.scss'
-  ])
-    .pipe(indexFilter)
-    .pipe($.inject(injectFiles, injectOptions))
-    .pipe(indexFilter.restore())
-    .pipe($.sass(sassOptions))
+  var webpackChangeHandler = function(err, stats) {
+    if(err) {
+      conf.errorHandler('Webpack')(err);
+    }
+    $.util.log(stats.toString({
+      colors: $.util.colors.supportsColor,
+      chunks: false,
+      hash: false,
+      version: false
+    }));
+    browserSync.reload();
+    if(watch) {
+      watch = false;
+      callback();
+    }
+  };
 
-  .pipe($.autoprefixer())
-    .on('error', function handleError(err) {
-      console.error(err.toString());
-      this.emit('end');
-    })
-    .pipe(gulp.dest(paths.tmp + '/serve/app/'));
+  var sources = [ path.join(conf.paths.src, '/app/index.module.js') ];
+  if (test) {
+    sources.push(path.join(conf.paths.src, '/app/**/*.spec.js'));
+  }
+
+  return gulp.src(sources)
+    .pipe(webpack(webpackOptions, null, webpackChangeHandler))
+    .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app')));
+}
+
+gulp.task('scripts', function () {
+  return webpackWrapper(false, false);
+});
+
+gulp.task('scripts:watch', ['scripts'], function (callback) {
+  return webpackWrapper(true, false, callback);
+});
+
+gulp.task('scripts:test', function () {
+  return webpackWrapper(false, true);
+});
+
+gulp.task('scripts:test-watch', ['scripts'], function (callback) {
+  return webpackWrapper(true, true, callback);
 });

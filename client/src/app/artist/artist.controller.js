@@ -1,9 +1,13 @@
-'use strict';
+class ArtistController {
+    constructor($http, baseurl, $routeParams) {
+        'ngInject';
 
-angular.module('client').controller('ArtistCtrl', function($scope, $routeParams, $http, baseURL) {
-    $scope.artist = $routeParams.artist;
-    
-    $http.get(baseURL + '/artist/' + $routeParams.artist).success(function(data){
-        $scope.songs = data;
-    });
-});
+        this.artist = $routeParams.artist;
+
+        $http.get(baseurl.base + '/artist/' + $routeParams.artist).then((res) => {
+            this.songs = res.data;
+        });
+    }
+}
+
+export default ArtistController;

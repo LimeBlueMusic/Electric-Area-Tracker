@@ -12,11 +12,11 @@ class songstream {
             callback(this.recent);
         } else {
             this.$http.get(this.base + '/recentBPM')
-                .success((data) => {
-                    for(let obj of data){
+                .then((res) => {
+                    for(let obj of res.data){
                         obj.xmSongID = obj.xmSongID.replace('#', '-');
                     }
-                    this.recent = data;
+                    this.recent = res.data;
                     callback(this.recent);
                 });
         }

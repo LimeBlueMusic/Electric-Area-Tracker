@@ -1,3 +1,4 @@
+/* global _:false, io:false, MG:false */
 import config from './index.config';
 import routerConfig from './index.route';
 import runBlock from './index.run';
@@ -16,9 +17,11 @@ import songstream from './services/songstream';
 angular.module('bpm', [
         'ngRoute',
         'btford.socket-io',
-        'angular-contextual-date',
+        'angular-contextual-date'
     ])
     .constant('io', io)
+    .constant('_', _)
+    .constant('MG', MG)
     .config(config)
     .config(routerConfig)
     .run(runBlock)

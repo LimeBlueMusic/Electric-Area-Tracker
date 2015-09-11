@@ -1,9 +1,9 @@
 class SongController {
-    constructor($http, baseurl, $routeParams) {
+    constructor($http, baseurl, $routeParams, _, MG) {
         'ngInject';
 
-        $http.get(baseurl.base + '/songstream/' + $routeParams.song.replace('#', '-')).success(function(data) {
-            var parseddata = _.map(data, function(n) {
+        $http.get(baseurl.base + '/songstream/' + $routeParams.song.replace('#', '-')).then(function(data) {
+            let parseddata = _.map(data, function(n) {
                 return {
                     date: new Date(n._id.year, n._id.month, n._id.day),
                     plays: n.count

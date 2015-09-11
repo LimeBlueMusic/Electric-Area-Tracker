@@ -193,7 +193,7 @@ mongo.connect(config.db, function(err, connection) {
                 } catch (e) {
                     console.log(e);
                 }
-                if (cur && res.channelMetadataResponse.messages.code !== 305 && !last.xmSongID && cur.song.id !== currentevent || last.xmSongID !== cur.song.id) {
+                if (cur && res.channelMetadataResponse.messages.code !== 305 && cur.song.id !== currentevent && last.xmSongID !== cur.song.id) {
                     currentevent = cur.song.id;
                     if (badIds.indexOf(cur.song.id) === -1) {
                         newSong(cur.artists.name, cur.song.name, cur);

@@ -60,9 +60,8 @@ function* mostHeard(next){
     yield next;
 }
 function* artists(artist, next){
-    console.log(this.params.artist);
     this.body = db.collection('tracks').find({artists: artist}).stream().pipe(JSONStream.stringify());
-    yield next; 
+    yield next;
 }
 function distinctArtists(callback){
     db.collection('tracks').distinct('artists', function(err, doc){

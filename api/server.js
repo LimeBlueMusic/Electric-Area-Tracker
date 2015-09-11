@@ -104,8 +104,9 @@ function* songstream(song, next){
     yield next;
 }
 
-mongo.connect(config.db, function(err, db) {
-    db.collection('stream').find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
+mongo.connect(config.db, function(err, connection) {
+    db = connection;
+    connection.collection('stream').find({}).sort({$natural: -1}).limit(1).next(function(err, doc) {
         last = doc;
     });
     function spotify(artists, track, info, callback) {

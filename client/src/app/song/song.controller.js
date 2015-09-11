@@ -1,5 +1,5 @@
 class SongController {
-    constructor($http, baseurl, $routeParams, _, MG) {
+    constructor($http, baseurl, $routeParams) {
         'ngInject';
 
         $http.get(baseurl.base + '/songstream/' + $routeParams.song.replace('#', '-')).then(function(res) {

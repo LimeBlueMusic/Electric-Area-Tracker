@@ -22,7 +22,7 @@
         <div class="col-sm-6">
             <div class="row">
                 <div class="col-xs-6">
-                    <div class="text-center card">
+                    <div class="text-xs-center card">
                         <div class="card-block">
                             <h2>{{vm.recent.length}}</h2>
                             <p class="card-text"><small>songs last 24 hours</small></p>
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <div class="text-center card">
+                    <div class="text-xs-center card">
                         <div class="card-block">
                             <h2>{{vm.unique24.length}}</h2>
                             <p class="card-text"><small>unique songs last 24 hours</small></p>
@@ -46,7 +46,7 @@
     <div class="row">
         <div class="col-md-4 col-lg-3" ng-repeat="song in vm.recent | limitTo:52 track by $index">
             <div class="card">
-                <img class="card-img-top" width="100%" ng-src="{{song.spotify.album_image || './assets/images/album_placeholder.jpg'}}" >
+                <img class="card-img-top" width="100%" ng-src="{{song.spotify.album_image || './assets/images/album_placeholder.jpg'}}">
                 <div class="card-block">
                     <p class="card-text"><small class="text-muted">{{song.heard | contextualDate}}</small></p>
                     <h6 class="card-title">{{song.track}}</h6>

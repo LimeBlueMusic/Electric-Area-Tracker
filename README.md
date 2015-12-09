@@ -8,3 +8,10 @@ Endpoint tracked
 ```HTTP
 http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25-08:10:00
 ```
+
+
+```javascript
+db.tracks.ensureIndex('artists');
+db.stream.ensureIndex('xmSongID');
+db.stream.ensureIndex('heard');
+```

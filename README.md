@@ -11,7 +11,7 @@ http://www.siriusxm.com/metadata/pdt/en-us/json/channels/thebeat/timestamp/02-25
 
 
 ```javascript
-db.tracks.ensureIndex('artists');
-db.stream.ensureIndex('xmSongID');
-db.stream.ensureIndex('heard');
+db.tracks.ensureIndex({'artists': 1});
+db.stream.ensureIndex({'xmSongID': 1});
+db.stream.ensureIndex({'heard': 1});
 ```

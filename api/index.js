@@ -98,16 +98,20 @@ function newSong(db, artists, track, xmInfo) {
     };
     artists = artists.split('#')[0].replace(/[\s\/\\()]/g, '+');
     track = track.split('#')[0].replace(/[\s\/\\()]/g, '+');
-    db.collection('tracks').find({xmSongID: info.xmSongID}).limit(1).next(function(err, doc) {
-        if (doc) {
-            info.spotify = doc.spotify;
-            updateTrack(db, info);
-        } else {
-            spotify(artists, track, info).then(info => {
-                updateTrack(db, info);
-            });
-        }
+    // do spotify for everything for a little while since it was broken
+    spotify(artists, track, info).then(info => {
+        updateTrack(db, info);
     });
+    // db.collection('tracks').find({xmSongID: info.xmSongID}).limit(1).next(function(err, doc) {
+    //     if (doc) {
+    //         info.spotify = doc.spotify;
+    //         updateTrack(db, info);
+    //     } else {
+    //         spotify(artists, track, info).then(info => {
+    //             updateTrack(db, info);
+    //         });
+    //     }
+    // });
 }
 
 function checkEndpoint(){

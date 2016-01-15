@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "keywords": [
     "bpm",
@@ -16,12 +16,12 @@
   "dependencies": {
     "JSONStream": "1.0.7",
     "concat-stream": "1.5.1",
-    "request-promise": "1.0.2",
+    "request-promise": "2.0.0",
     "kcors": "1.0.1",
     "koa-route": "2.4.2",
     "koa.io": "koajs/koa.io",
-    "lodash": "3.10.1",
-    "moment": "2.10.6",
-    "mongodb": "2.1.0"
+    "lodash": "4.0.0",
+    "moment": "2.11.1",
+    "mongodb": "2.1.4"
   }
 }

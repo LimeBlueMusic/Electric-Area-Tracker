@@ -9,7 +9,7 @@ class HomeController {
         });
     }
     mostHeard() {
-        let songid = _.chain(this.recent).pluck('xmSongID').countBy().pairs().max(_.last).first().value();
+        let songid = _.chain(this.recent).map('xmSongID').countBy().toPairs().max(_.last).first().value();
         this.mostHeard = _.find(this.recent, 'xmSongID', songid);
         this.unique24 = _.uniq(this.recent, function(hist) {
             return hist.xmSongID;

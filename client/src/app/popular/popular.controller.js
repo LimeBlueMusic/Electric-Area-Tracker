@@ -1,12 +1,10 @@
-class PopularController {
-    constructor($http, baseurl) {
+export class PopularController {
+    constructor($http, BaseUrl) {
         'ngInject';
 
-        $http.get(baseurl.base + '/mostHeard').then((res) => {
+        $http.get(BaseUrl.host() + '/mostHeard').then((res) => {
             this.songs = res.data;
         });
 
     }
 }
-
-export default PopularController;

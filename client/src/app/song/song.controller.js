@@ -1,8 +1,8 @@
-class SongController {
-    constructor($http, baseurl, $routeParams) {
+export class SongController {
+    constructor($http, BaseUrl, $routeParams) {
         'ngInject';
 
-        $http.get(baseurl.base + '/songstream/' + $routeParams.song.replace('#', '-')).then(function(res) {
+        $http.get(BaseUrl.host() + '/songstream/' + $routeParams.song.replace('#', '-')).then(function(res) {
             let parseddata = _.map(res.data, function(n) {
                 return {
                     date: new Date(n._id.year, n._id.month, n._id.day),
@@ -28,11 +28,9 @@ class SongController {
             });
         });
 
-        $http.get(baseurl.base + '/song/' + $routeParams.song.replace('#', '-')).then((res) => {
+        $http.get(BaseUrl.host() + '/song/' + $routeParams.song.replace('#', '-')).then((res) => {
             this.song = res.data[0];
         });
 
     }
 }
-
-export default SongController;

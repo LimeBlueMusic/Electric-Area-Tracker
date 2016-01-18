@@ -1,4 +1,4 @@
-class HomeController {
+export class HomeController {
     constructor(songstream) {
         'ngInject';
         this.recent = [];
@@ -16,5 +16,3 @@ class HomeController {
         });
     }
 }
-
-export default HomeController;

@@ -1,12 +1,10 @@
-class RecentController {
-    constructor($http, baseurl) {
+export class RecentController {
+    constructor($http, BaseUrl) {
         'ngInject';
 
-        $http.get(baseurl.base + '/new').then((res) => {
+        $http.get(BaseUrl.host() + '/new').then((res) => {
             this.songs = res.data;
         });
 
     }
 }
-
-export default RecentController;

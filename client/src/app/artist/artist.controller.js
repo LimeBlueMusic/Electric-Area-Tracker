@@ -1,13 +1,11 @@
-class ArtistController {
-    constructor($http, baseurl, $routeParams) {
+export class ArtistController {
+    constructor($http, BaseUrl, $routeParams) {
         'ngInject';
 
         this.artist = $routeParams.artist;
 
-        $http.get(baseurl.base + '/artist/' + $routeParams.artist).then((res) => {
+        $http.get(BaseUrl.host() + '/artist/' + $routeParams.artist).then((res) => {
             this.songs = res.data;
         });
     }
 }
-
-export default ArtistController;

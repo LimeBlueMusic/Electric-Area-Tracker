@@ -1,14 +1,28 @@
-class baseurl {
+export class BaseUrl {
     constructor($location) {
         'ngInject';
-        this.host = $location.host();
+
+        this.hosted = $location.host();
+
     }
-    get base() {
-        if (this.host === 'localhost') {
+    host() {
+        if (this.hosted === 'localhost' || this.hosted === '127.0.0.1') {
             return '//localhost:5000';
         }
         return '//bpmbackend.scttcper.com';
     }
 }
 
-export default baseurl;
+
+export function BaseUrlInterceptor(BaseUrl) {
+    'ngInject';
+
+    return {
+        'request': function(config) {
+            if (config.url.indexOf('/api') === 0) {
+                config.url = BaseUrl.host() + config.url.slice(4);
+            }
+            return config;
+        }
+    };
+}

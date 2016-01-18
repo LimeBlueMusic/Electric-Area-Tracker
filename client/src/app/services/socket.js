@@ -1,8 +1,8 @@
-class socket {
-    constructor(socketFactory, baseurl) {
+export class socket {
+    constructor(socketFactory, BaseUrl) {
         'ngInject';
         this.socketFactory = socketFactory;
-        this.base = baseurl.base;
+        this.base = BaseUrl.host();
     }
     connection() {
         return this.socketFactory({
@@ -10,5 +10,3 @@ class socket {
         });
     }
 }
-
-export default socket;

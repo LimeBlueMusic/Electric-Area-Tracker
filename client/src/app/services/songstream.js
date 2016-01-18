@@ -1,9 +1,9 @@
-class songstream {
-    constructor($http, baseurl, socket) {
+export class songstream {
+    constructor($http, BaseUrl, socket) {
         'ngInject';
         this.recent = [];
         this.isWatching = false;
-        this.base = baseurl.base;
+        this.base = BaseUrl.host();
         this.socket = socket.connection();
         this.$http = $http;
     }
@@ -29,5 +29,3 @@ class songstream {
         }
     }
 }
-
-export default songstream;

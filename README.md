@@ -1,5 +1,5 @@
 # BPM Radio Station Tracking
-![http://imgur.com/8rIKBwt](running example)
+![running example](http://i.imgur.com/8rIKBwt.jpg)
 
 Tracking sirius xm satellite radio station BPM and storing the data in mongo.
 Broken down into a AngularJS frontend and Node backend with websockets from koa.io to show live streaming tracks. Built using bootstrap 4.

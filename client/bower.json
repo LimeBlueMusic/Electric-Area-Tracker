@@ -2,9 +2,9 @@
   "name": "bpm",
   "version": "0.0.1",
   "dependencies": {
-    "angular": "1.5.0-rc.0",
+    "angular": "1.5.0-rc.1",
     "angular-contextual-date": "0.4.0",
-    "angular-route": "1.4.8",
+    "angular-route": "1.5.0-rc.1",
     "angular-socket-io": "0.7.0",
     "bootstrap": "4.0.0-alpha.2",
     "lodash": "4.0.0",
@@ -12,6 +12,6 @@
     "socket.io-client": "1.4.4"
   },
   "resolutions": {
-    "angular": "1.4.8"
+    "angular": "1.5.0-rc.1"
   }
 }

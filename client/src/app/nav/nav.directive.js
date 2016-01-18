@@ -1,18 +1,16 @@
-class NavDirective {
-    constructor() {
-        'ngInject';
+export function NavDirective() {
+    'ngInject';
 
-        let directive = {
-            restrict: 'E',
-            templateUrl: 'app/nav/nav.html',
-            scope: {},
-            controller: NavController,
-            controllerAs: 'vm',
-            bindToController: true
-        };
+    let directive = {
+        restrict: 'E',
+        templateUrl: 'app/nav/nav.html',
+        scope: {},
+        controller: NavController,
+        controllerAs: 'vm',
+        bindToController: true
+    };
 
-        return directive;
-    }
+    return directive;
 }
 
 class NavController {
@@ -22,5 +20,3 @@ class NavController {
 
     }
 }
-
-export default NavDirective;

@@ -1,13 +1,12 @@
 class socket {
-    constructor(socketFactory, baseurl, io) {
+    constructor(socketFactory, baseurl) {
         'ngInject';
         this.socketFactory = socketFactory;
         this.base = baseurl.base;
-        this.io = io;
     }
     connection() {
         return this.socketFactory({
-            ioSocket: this.io.connect(this.base)
+            ioSocket: io.connect(this.base)
         });
     }
 }

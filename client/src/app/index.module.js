@@ -1,4 +1,3 @@
-/* global _:false, io:false, MG:false */
 import config from './index.config';
 import routerConfig from './index.route';
 import runBlock from './index.run';
@@ -8,8 +7,8 @@ import RecentController from './recent/recent.controller';
 import ArtistsController from './artists/artists.controller';
 import ArtistController from './artist/artist.controller';
 import SongController from './song/song.controller';
-import NavDirective from './nav/nav.directive';
-import LinksDirective from './links/links.directive';
+import { NavDirective } from './nav/nav.directive';
+import { LinksDirective } from './links/links.directive';
 import baseurl from './services/baseurl';
 import socket from './services/socket';
 import songstream from './services/songstream';
@@ -19,9 +18,6 @@ angular.module('bpm', [
         'btford.socket-io',
         'angular-contextual-date'
     ])
-    .constant('io', io)
-    .constant('_', _)
-    .constant('MG', MG)
     .config(config)
     .config(routerConfig)
     .run(runBlock)
@@ -34,5 +30,5 @@ angular.module('bpm', [
     .controller('ArtistsController', ArtistsController)
     .controller('ArtistController', ArtistController)
     .controller('SongController', SongController)
-    .directive('bpmLinks', () => new LinksDirective())
-    .directive('bpmNav', () => new NavDirective());
+    .directive('bpmLinks', LinksDirective)
+    .directive('bpmNav', NavDirective);

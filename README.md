@@ -1,4 +1,4 @@
-# BPM Radio Station Tracking
+## Sirius XM Radio Station Tracker
 ![running example](http://i.imgur.com/8rIKBwt.jpg)
 
 Tracking sirius xm satellite radio station BPM and storing the data in mongo.

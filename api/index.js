@@ -74,12 +74,12 @@ function updateTrack(db, info) {
     db.collection('tracks').update({xmSongID: info.xmSongID}, {
         $inc: {'plays': 1},
         $currentDate: {lastHeard: true},
+        $set: {spotify: info.spotify},
         $setOnInsert: {
             firstHeard: moment.utc().toDate(),
             artists: info.artists,
             track: info.track,
-            xmSongID: info.xmSongID,
-            spotify: info.spotify
+            xmSongID: info.xmSongID
         }
     }, {
         upsert: true
